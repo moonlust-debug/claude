@@ -18,7 +18,8 @@
 ## 로컬 설치
 
 ```sh
-./setup.sh <BOT_TOKEN>
+./setup.sh <BOT_TOKEN>                      # 페어링 절차를 거치는 기본 방식
+./setup.sh <BOT_TOKEN> --allow <숫자ID>      # 페어링 없이 바로 사용
 ```
 
 토큰은 텔레그램에서 [@BotFather](https://t.me/BotFather)에게 `/newbot`을 보내 받는다.
@@ -52,6 +53,25 @@ claude --channels plugin:telegram@claude-plugins-official   # 이 플래그 없�
 
 `pairing` 정책은 숫자 ID를 확보하기 위한 임시 상태다. 확보한 뒤에는 `allowlist`로
 바꿔야 모르는 사람이 페어링 코드를 받아 가지 않는다.
+
+### 페어링을 건너뛰기
+
+페어링의 목적은 숫자 ID 확보뿐이다. ID를 이미 안다면 절차 전체가 불필요하다.
+
+```sh
+./setup.sh <BOT_TOKEN> --allow 5046959738          # 여러 명은 쉼표로 구분
+```
+
+`access.json`을 `allowlist` 정책으로 직접 쓴다. 기존 파일이 있으면 `.bak`으로
+백업한다. 처음부터 잠긴 상태로 시작하므로, `pairing`을 거쳤다가 나중에 잠그는
+것보다 노출 창이 없다는 점에서 오히려 안전하다.
+
+본인 ID는 텔레그램에서 [@userinfobot](https://t.me/userinfobot)에게 물어보면 된다.
+`@username`이 아니라 숫자다.
+
+`access.json`은 인바운드 메시지마다 다시 읽히므로 정책 변경에 재시작이 필요 없다.
+반면 `.env`의 토큰은 서버 부팅 시 한 번만 읽으므로 토큰을 바꾸면 세션을 다시 띄워야
+한다.
 
 ## 원격 컨테이너에서 마주친 문제
 

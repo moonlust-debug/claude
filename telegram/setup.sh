@@ -2,22 +2,54 @@
 # Telegram 채널 로컬 설정 — 본인 머신에서 실행하세요.
 #
 # 사용법:
-#   ./telegram-setup.sh <BOT_TOKEN>
+#   ./setup.sh <BOT_TOKEN> [--allow <ID>[,<ID>...]]
 #
 # 토큰은 텔레그램에서 @BotFather 에게 /newbot 을 보내 발급받습니다.
 # (형식: 123456789:AAH... — 숫자 접두사 + 콜론 + 문자열)
+#
+# --allow 를 주면 해당 숫자 사용자 ID 를 허용 목록에 넣고 정책을 allowlist 로
+# 잠근 채로 시작합니다. 페어링 코드를 주고받는 단계가 사라집니다.
+# 페어링은 숫자 ID 를 알아내기 위한 절차일 뿐이므로, ID 를 이미 안다면 불필요합니다.
+# 본인 ID 는 텔레그램에서 @userinfobot 에게 물어보면 알려줍니다.
+#
+# --allow 없이 실행하면 access.json 을 건드리지 않습니다. 파일이 없으면
+# 플러그인 기본값(pairing 정책)이 적용되어 첫 DM 에 페어링 코드가 발급됩니다.
 
 set -euo pipefail
 
-TOKEN="${1:-}"
+TOKEN=""
+ALLOW_IDS=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --allow)
+      [ $# -ge 2 ] || { echo "오류: --allow 에 ID 가 없습니다." >&2; exit 1; }
+      ALLOW_IDS="$2"; shift 2 ;;
+    --allow=*)
+      ALLOW_IDS="${1#--allow=}"; shift ;;
+    -h|--help)
+      sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -*)
+      echo "오류: 알 수 없는 옵션 $1" >&2; exit 1 ;;
+    *)
+      [ -z "$TOKEN" ] || { echo "오류: 토큰이 두 번 지정됐습니다." >&2; exit 1; }
+      TOKEN="$1"; shift ;;
+  esac
+done
+
 if [ -z "$TOKEN" ]; then
   echo "오류: 봇 토큰을 인자로 넘겨주세요." >&2
-  echo "사용법: $0 <BOT_TOKEN>" >&2
+  echo "사용법: $0 <BOT_TOKEN> [--allow <ID>[,<ID>...]]" >&2
   exit 1
 fi
 
 if ! printf '%s' "$TOKEN" | grep -qE '^[0-9]+:[A-Za-z0-9_-]+$'; then
   echo "오류: 토큰 형식이 BotFather 토큰과 다릅니다 (예: 123456789:AAH...)." >&2
+  exit 1
+fi
+
+if [ -n "$ALLOW_IDS" ] && ! printf '%s' "$ALLOW_IDS" | grep -qE '^[0-9]+(,[0-9]+)*$'; then
+  echo "오류: --allow 는 쉼표로 구분된 숫자 ID 여야 합니다 (예: 5046959738)." >&2
+  echo "       @username 이 아니라 숫자 ID 입니다. @userinfobot 에서 확인하세요." >&2
   exit 1
 fi
 
@@ -50,6 +82,25 @@ else
 fi
 chmod 600 "$STATE_DIR/.env"
 echo "    저장 완료 (권한 600): $STATE_DIR/.env"
+
+if [ -n "$ALLOW_IDS" ]; then
+  # 허용 목록을 직접 써서 페어링 단계를 건너뛴다.
+  # access.json 은 인바운드 메시지마다 다시 읽히므로 재시작이 필요 없다.
+  ACCESS_FILE="$STATE_DIR/access.json"
+  [ -f "$ACCESS_FILE" ] && cp "$ACCESS_FILE" "$ACCESS_FILE.bak" && echo "    기존 access.json → access.json.bak 백업"
+  JSON_IDS=$(printf '%s' "$ALLOW_IDS" | sed 's/,/", "/g')
+  cat > "$ACCESS_FILE" <<EOF
+{
+  "dmPolicy": "allowlist",
+  "allowFrom": ["$JSON_IDS"],
+  "groups": {},
+  "ackReaction": "👀",
+  "replyToMode": "first"
+}
+EOF
+  echo "    접근 정책: allowlist / 허용 ID: $ALLOW_IDS"
+  echo "    → 페어링 코드 없이 바로 통합니다 (코드는 발급되지 않는 것이 정상)."
+fi
 
 echo "==> 4/4  텔레그램 API 연결 확인"
 BODY_FILE=$(mktemp)
@@ -100,7 +151,25 @@ case "$HTTP_CODE" in
     ;;
 esac
 
-cat <<EOF
+if [ -n "$ALLOW_IDS" ]; then
+  cat <<EOF
+
+────────────────────────────────────────────────────────
+설정 완료. 페어링 단계는 필요 없습니다.
+
+채널 플래그를 붙여 세션을 시작하세요 (이 플래그 없으면 서버가 연결되지 않습니다):
+
+     claude --channels plugin:telegram@claude-plugins-official
+
+세션을 켜 둔 채로 봇에게 DM 하면 바로 통합니다.
+허용 목록에 없는 사람의 DM 은 조용히 버려집니다(코드도 나가지 않음).
+
+허용 목록 변경:  /telegram:access add <ID>  /  remove <ID>
+상태 확인:       /telegram:configure
+────────────────────────────────────────────────────────
+EOF
+else
+  cat <<EOF
 
 ────────────────────────────────────────────────────────
 설정 완료. 이제 아래 순서로 페어링하세요.
@@ -120,6 +189,10 @@ cat <<EOF
 
      /telegram:access policy allowlist
 
+숫자 ID 를 이미 안다면 위 과정을 건너뛸 수 있습니다:
+     $0 <토큰> --allow <ID>
+
 상태 확인은 인자 없이:  /telegram:configure
 ────────────────────────────────────────────────────────
 EOF
+fi
