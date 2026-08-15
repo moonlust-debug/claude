@@ -2,7 +2,7 @@
 # Telegram 채널 로컬 설정 — 본인 머신에서 실행하세요.
 #
 # 사용법:
-#   ./setup.sh <BOT_TOKEN> [--allow <ID>[,<ID>...]]
+#   ./setup.sh <BOT_TOKEN> [--allow <ID>[,<ID>...]] [--no-web-tools]
 #
 # 토큰은 텔레그램에서 @BotFather 에게 /newbot 을 보내 발급받습니다.
 # (형식: 123456789:AAH... — 숫자 접두사 + 콜론 + 문자열)
@@ -14,11 +14,17 @@
 #
 # --allow 없이 실행하면 access.json 을 건드리지 않습니다. 파일이 없으면
 # 플러그인 기본값(pairing 정책)이 적용되어 첫 DM 에 페어링 코드가 발급됩니다.
+#
+# 기본적으로 웹 도구(WebSearch/WebFetch)를 사용자 설정에 허용해 둡니다. 채널
+# 세션은 권한 프롬프트를 텔레그램으로 띄울 수단이 없어서, 미리 허용해 두지
+# 않으면 검색이 필요한 요청이 "권한 없음"으로 끝납니다. --no-web-tools 를 주면
+# 이 단계를 건너뜁니다.
 
 set -euo pipefail
 
 TOKEN=""
 ALLOW_IDS=""
+WEB_TOOLS=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --allow)
@@ -26,8 +32,10 @@ while [ $# -gt 0 ]; do
       ALLOW_IDS="$2"; shift 2 ;;
     --allow=*)
       ALLOW_IDS="${1#--allow=}"; shift ;;
+    --no-web-tools)
+      WEB_TOOLS=0; shift ;;
     -h|--help)
-      sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+      sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*)
       echo "오류: 알 수 없는 옵션 $1" >&2; exit 1 ;;
     *)
@@ -53,9 +61,11 @@ if [ -n "$ALLOW_IDS" ] && ! printf '%s' "$ALLOW_IDS" | grep -qE '^[0-9]+(,[0-9]+
   exit 1
 fi
 
-STATE_DIR="${TELEGRAM_STATE_DIR:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}/channels/telegram}"
+CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+STATE_DIR="${TELEGRAM_STATE_DIR:-$CONFIG_DIR/channels/telegram}"
+SETTINGS_FILE="$CONFIG_DIR/settings.json"
 
-echo "==> 1/4  전제 조건 확인"
+echo "==> 1/5  전제 조건 확인"
 command -v claude >/dev/null || { echo "claude CLI 가 없습니다. https://claude.com/claude-code 참고" >&2; exit 1; }
 if ! command -v bun >/dev/null; then
   echo "bun 이 없습니다. MCP 서버가 bun 위에서 동작합니다. 설치:" >&2
@@ -65,12 +75,12 @@ fi
 echo "    claude: $(claude --version)"
 echo "    bun:    $(bun --version)"
 
-echo "==> 2/4  마켓플레이스 + 플러그인 설치"
+echo "==> 2/5  마켓플레이스 + 플러그인 설치"
 claude plugin marketplace add anthropics/claude-plugins-official || true
 claude plugin install telegram@claude-plugins-official || true
 claude plugin list | sed -n '1,12p'
 
-echo "==> 3/4  토큰 저장 → $STATE_DIR/.env"
+echo "==> 3/5  토큰 저장 → $STATE_DIR/.env"
 mkdir -p "$STATE_DIR"
 if [ -f "$STATE_DIR/.env" ] && grep -q '^TELEGRAM_BOT_TOKEN=' "$STATE_DIR/.env"; then
   # 기존 키는 보존하고 토큰 줄만 교체
@@ -102,7 +112,82 @@ EOF
   echo "    → 페어링 코드 없이 바로 통합니다 (코드는 발급되지 않는 것이 정상)."
 fi
 
-echo "==> 4/4  텔레그램 API 연결 확인"
+echo "==> 4/5  웹 도구 권한 → $SETTINGS_FILE"
+# 채널 세션은 권한 프롬프트를 텔레그램으로 띄울 수단이 없다. 미리 허용해 두지
+# 않으면 검색이 필요한 요청이 그대로 "권한 없음"으로 끝난다.
+#
+# 프로젝트 설정(.claude/settings.json)이 아니라 사용자 설정에 쓰는 이유는,
+# 프로젝트 설정이 세션을 띄운 디렉터리에서만 유효하기 때문이다. 채널 세션을
+# 어디서 띄우든 통하게 하려면 사용자 레벨이어야 한다.
+#
+# WebFetch 를 같이 넣는 것은 검색 결과 페이지를 열어 읽는 두 번째 단계에서
+# 다시 막히지 않게 하기 위해서다.
+if [ "$WEB_TOOLS" = 0 ]; then
+  echo "    건너뜀 (--no-web-tools)"
+elif ! command -v python3 >/dev/null; then
+  echo "    건너뜀: python3 가 없어 JSON 을 병합하지 못했습니다." >&2
+  echo "           $SETTINGS_FILE 의 permissions.allow 에 다음을 직접 넣으세요:" >&2
+  echo '             "WebSearch", "WebFetch"' >&2
+else
+  mkdir -p "$CONFIG_DIR"
+  # 기존 설정은 보존하고 없는 항목만 덧붙인다. 추가한 항목을 stdout 으로 돌려준다.
+  if ADDED=$(python3 - "$SETTINGS_FILE" <<'PY'
+import json, os, shutil, sys
+
+path = sys.argv[1]
+want = ["WebSearch", "WebFetch"]
+
+# 새로 만드는 경우에만 $schema 를 맨 앞에 둔다 (기존 파일의 키 순서는 건드리지 않음)
+existed = os.path.exists(path)
+data = {} if existed else {"$schema": "https://json.schemastore.org/claude-code-settings.json"}
+if existed:
+    with open(path, encoding="utf-8") as f:
+        text = f.read().strip()
+    if text:
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as e:
+            # 깨진 파일을 덮어쓰지 않는다 — 셸이 경고하고 수동 안내로 넘어간다
+            raise SystemExit(f"    {os.path.basename(path)} JSON 파싱 실패: {e}")
+if not isinstance(data, dict):
+    raise SystemExit("    settings.json 최상위가 객체가 아닙니다")
+
+# 값을 만들기 전에 형태부터 확인한다 — 예상 밖의 타입이면 건드리지 않고 빠진다
+perms = data.setdefault("permissions", {})
+if not isinstance(perms, dict):
+    raise SystemExit("    permissions 가 객체가 아닙니다")
+allow = perms.setdefault("allow", [])
+if not isinstance(allow, list):
+    raise SystemExit("    permissions.allow 가 배열이 아닙니다")
+
+added = [t for t in want if t not in allow]
+if added:
+    allow.extend(added)
+    if existed:
+        shutil.copy2(path, path + ".bak")
+        print("    기존 설정 → settings.json.bak 백업", file=sys.stderr)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    os.replace(tmp, path)  # 원자적 교체 — 중간 상태의 설정 파일이 읽히지 않게
+
+print(" ".join(added))
+PY
+  ); then
+    if [ -n "$ADDED" ]; then
+      echo "    허용 추가: $ADDED"
+    else
+      echo "    이미 허용돼 있음 — 변경 없음"
+    fi
+  else
+    echo "    경고: $SETTINGS_FILE 를 수정하지 못했습니다 (JSON 파싱 실패 등)." >&2
+    echo "           파일을 직접 열어 permissions.allow 에 다음을 넣으세요:" >&2
+    echo '             "WebSearch", "WebFetch"' >&2
+  fi
+fi
+
+echo "==> 5/5  텔레그램 API 연결 확인"
 BODY_FILE=$(mktemp)
 trap 'rm -f "$BODY_FILE"' EXIT
 HTTP_CODE=$(curl -s --max-time 15 -o "$BODY_FILE" -w '%{http_code}' \
@@ -161,6 +246,8 @@ if [ -n "$ALLOW_IDS" ]; then
 
      claude --channels plugin:telegram@claude-plugins-official
 
+이미 떠 있는 세션이 있다면 재시작하세요 — 권한 설정은 세션 시작 시 한 번만 읽습니다.
+
 세션을 켜 둔 채로 봇에게 DM 하면 바로 통합니다.
 허용 목록에 없는 사람의 DM 은 조용히 버려집니다(코드도 나가지 않음).
 
@@ -177,6 +264,8 @@ else
 1) 채널 플래그를 붙여 새 세션 시작 (이 플래그 없으면 서버가 연결되지 않습니다):
 
      claude --channels plugin:telegram@claude-plugins-official
+
+   (이미 떠 있는 세션이 있다면 재시작하세요 — 권한 설정은 시작 시 한 번만 읽힙니다.)
 
 2) 그 세션을 켜 둔 채로, 텔레그램에서 봇에게 DM 을 보냅니다.
    봇이 6자리 페어링 코드로 응답합니다.

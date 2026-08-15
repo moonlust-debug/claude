@@ -20,6 +20,7 @@
 ```sh
 ./setup.sh <BOT_TOKEN>                      # 페어링 절차를 거치는 기본 방식
 ./setup.sh <BOT_TOKEN> --allow <숫자ID>      # 페어링 없이 바로 사용
+./setup.sh <BOT_TOKEN> --no-web-tools        # 웹 도구 허용은 건드리지 않기
 ```
 
 토큰은 텔레그램에서 [@BotFather](https://t.me/BotFather)에게 `/newbot`을 보내 받는다.
@@ -28,9 +29,10 @@
 1. `claude` / `bun` 전제 조건 확인 (MCP 서버가 bun 위에서 동작)
 2. 마켓플레이스 추가 + 플러그인 설치 (이미 되어 있으면 건너뜀)
 3. `~/.claude/channels/telegram/.env`에 토큰 저장 (권한 600, 기존 키 보존)
-4. `getMe`로 봇 실물 확인
+4. `~/.claude/settings.json`에 `WebSearch`/`WebFetch` 허용 추가 (아래 참고)
+5. `getMe`로 봇 실물 확인
 
-재실행해도 안전하다. 4단계는 실패 원인을 구분해서 알려준다.
+재실행해도 안전하다. 5단계는 실패 원인을 구분해서 알려준다.
 
 | 응답 | 진단 |
 | --- | --- |
@@ -72,6 +74,44 @@ claude --channels plugin:telegram@claude-plugins-official   # 이 플래그 없�
 `access.json`은 인바운드 메시지마다 다시 읽히므로 정책 변경에 재시작이 필요 없다.
 반면 `.env`의 토큰은 서버 부팅 시 한 번만 읽으므로 토큰을 바꾸면 세션을 다시 띄워야
 한다.
+
+## 웹 검색 권한
+
+텔레그램으로 "오늘 날씨" 같은 요청을 보내면 세션이 검색을 시도하다 권한에서 막힌다.
+채널 세션에는 권한 프롬프트를 띄울 상대가 없기 때문이다 — 사용자는 텔레그램에 있고
+프롬프트는 터미널에 뜨므로, 아무도 답하지 않는 채로 요청이 "권한 없음"으로 끝난다.
+그래서 도구는 세션이 시작되기 전에 미리 허용돼 있어야 한다.
+
+`setup.sh`의 4단계가 `~/.claude/settings.json`에 이것을 넣는다.
+
+```json
+{
+  "permissions": {
+    "allow": ["WebSearch", "WebFetch"]
+  }
+}
+```
+
+기존 설정은 병합해서 보존하고, 없는 항목만 덧붙인다. 파일을 고치기 전에 `.bak`으로
+백업하며, JSON이 깨져 있으면 덮어쓰지 않고 수동 안내만 출력한다. 이미 허용돼 있으면
+아무것도 하지 않는다. 건너뛰려면 `--no-web-tools`.
+
+**프로젝트 설정(`.claude/settings.json`)이 아니라 사용자 설정에 쓴다.** 프로젝트
+설정은 세션을 띄운 디렉터리에서만 유효해서, 채널 세션을 다른 곳에서 띄우면 같은
+증상이 그대로 재발한다. 사용자 레벨이어야 어디서 띄우든 통한다.
+
+`WebFetch`를 같이 넣는 이유는 검색이 두 단계이기 때문이다. `WebSearch`로 결과
+목록을 받고 `WebFetch`로 실제 페이지를 열어 읽는데, 앞쪽만 허용하면 두 번째에서
+다시 막힌다.
+
+권한 설정은 **세션 시작 시 한 번만 읽힌다.** `access.json`과 달리 재시작이 필요하다.
+이미 채널 세션이 떠 있다면 껐다 켜야 적용된다.
+
+파일을 건드리지 않고 한 번만 쓰려면 실행 플래그로도 된다.
+
+```sh
+claude --channels plugin:telegram@claude-plugins-official --allowedTools WebSearch WebFetch
+```
 
 ## 원격 컨테이너에서 마주친 문제
 
