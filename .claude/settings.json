@@ -71,7 +71,9 @@
 
       "Read",
       "Glob",
-      "Grep"
+      "Grep",
+      "WebSearch",
+      "WebFetch"
     ],
     "ask": [
       "Bash(git push:*)",
@@ -90,8 +92,7 @@
       "Bash(curl:*)",
       "Bash(wget:*)",
       "Bash(ssh:*)",
-      "Bash(scp:*)",
-      "WebFetch"
+      "Bash(scp:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
