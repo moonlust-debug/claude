@@ -5,6 +5,8 @@
       "Read",
       "Glob",
       "Grep",
+      "WebSearch",
+      "WebFetch",
       "Bash(pwd)",
       "Bash(ls:*)",
       "Bash(tree:*)",
