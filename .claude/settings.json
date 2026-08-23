@@ -16,5 +16,19 @@
   },
   "enabledPlugins": {
     "watch@claude-video": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-video-deps.sh\"",
+            "timeout": 900
+          }
+        ]
+      }
+    ]
   }
 }
