@@ -1,0 +1,17 @@
+--- a/server.ts
++++ b/server.ts
+@@ -92,7 +92,13 @@
+ // Strict: no bare yes/no (conversational), no prefix/suffix chatter.
+ const PERMISSION_REPLY_RE = /^\s*(y|yes|n|no)\s+([a-km-z]{5})\s*$/i
+ 
+-const bot = new Bot(TOKEN)
++// TELEGRAM_API_ROOT: 봇 API 엔드포인트 재지정 (기본값은 grammy 의 api.telegram.org).
++// 이그레스 프록시 뒤에서 bun 의 TLS 가 CONNECT 터널을 통과하지 못하는 환경에서,
++// curl 로 중계하는 로컬 릴레이를 가리키게 하려고 둔다.
++const API_ROOT = process.env.TELEGRAM_API_ROOT
++const bot = API_ROOT
++  ? new Bot(TOKEN, { client: { apiRoot: API_ROOT } })
++  : new Bot(TOKEN)
+ let botUsername = ''
+ 
+ type PendingEntry = {
