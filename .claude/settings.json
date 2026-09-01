@@ -178,6 +178,12 @@
             "timeout": 60
           }
         ]
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-user-memory.sh\"",
+            "timeout": 60
+          }
+        ]
             "timeout": 600
           }
         ]
