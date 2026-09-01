@@ -14,6 +14,8 @@
 |------|-------------|
 | `install-skills.sh` | `npx skills add` 로 개인 스킬 설치. 현재 대상은 `anthropics/skills:skill-creator` |
 | `install-video-deps.sh` | `/watch` 플러그인(watch@claude-video)이 필요한 `ffmpeg`·`ffprobe`·`yt-dlp` 확보 |
+| `install-user-memory.sh` | `user-memory.md` 를 `~/.claude/CLAUDE.md` 의 마커 블록에 반영 |
+| `user-memory.md` | 위 스크립트가 설치하는 전역 설정 원본. 스크립트가 아니라 데이터다 |
 
 ## Subdirectories
 없음.
@@ -28,6 +30,12 @@
   이 머신에서는 그 경로가 `D:\claude\skills` 를 가리키는 정션이라 결과적으로 D: 에
   떨어지지만, D: 가 없는 웹 세션에서도 같은 스크립트가 동작해야 하므로 하드코딩하지 않는다.
 - 새 스킬을 추가할 때는 `SKILLS` 배열에 `repo:skill` 한 줄만 넣는다.
+- `install-user-memory.sh` 는 `~/.claude/CLAUDE.md` 를 통째로 쓰지 않는다.
+  `<!-- BEGIN moonlust-debug/claude -->` ~ `<!-- END ... -->` 사이만 교체하고
+  나머지는 그대로 둔다. 그 파일에는 손으로 쓴 전역 메모리가 있을 수 있으므로,
+  이 성질을 깨는 수정(전체 덮어쓰기, 마커 제거)은 하지 않는다.
+- 전역 설정 문구를 바꿀 때는 `user-memory.md` 만 고친다. 스크립트는 손댈 필요가 없다.
+  단, 저장소 루트 `CLAUDE.md`(이 저장소 한정)와는 별개 파일이라 함께 고쳐야 한다.
 
 ### Testing Requirements
 - `bash -n <file>` 로 문법 확인.

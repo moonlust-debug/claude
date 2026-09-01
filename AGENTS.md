@@ -13,6 +13,8 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 |------|-------------|
 | `README.md` | 제목 한 줄뿐인 자리표시자 |
 | `.gitignore` | `memory/` 만 제외 — 개인 메모리를 GitHub 로 올리지 않으려는 목적 |
+| `CLAUDE.md` | 이 저장소에서 작업할 때만 적용되는 설정. 전역용은 `.claude/hooks/user-memory.md` |
+| `skills-lock.json` | `npx skills` 로 설치한 프로젝트 스킬의 출처와 해시 |
 
 ## Subdirectories
 | Directory | Purpose |
