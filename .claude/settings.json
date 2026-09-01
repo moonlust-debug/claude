@@ -171,19 +171,7 @@
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-skills.sh\""     },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-user-memory.sh\"",
-            "timeout": 60
-          }
-        ]
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-user-memory.sh\"",
-            "timeout": 60
-          }
-        ]
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-skills.sh\"",
             "timeout": 600
           }
         ]
