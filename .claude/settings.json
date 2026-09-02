@@ -18,7 +18,6 @@
       "Bash(kill -9:*)",
       "Bash(killall:*)",
       "Bash(history -c)",
-      "Bash(:(){ :|:& };:)",
       "Bash(ssh:*)",
       "Bash(scp:*)",
       "Bash(sftp:*)",
