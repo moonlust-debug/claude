@@ -11,7 +11,8 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 ## Key Files
 | File | Description |
 |------|-------------|
-| `README.md` | 제목 한 줄뿐인 자리표시자 |
+| `setup.sh` | 새 머신 부트스트랩. Claude Code 설치 확인 → 저장소 확보 → `~/.claude/skills` 링크 → 사용자 설정 병합 → 스킬 설치. 멱등하다 |
+| `README.md` | 저장소 소개와 새 머신 설치 절차 |
 | `.gitignore` | `memory/` 만 제외 — 개인 메모리를 GitHub 로 올리지 않으려는 목적 |
 
 ## Subdirectories
@@ -38,6 +39,12 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   `%USERPROFILE%\.claude\settings.json`)에 같은 키를 넣거나 `/config` 의
   "Enable Remote Control for all sessions" 를 끈다. 기능 자체를 없애려면
   `disableRemoteControl: true` 를 쓴다.
+- `setup.sh` 는 최초 1회용이 아니라 **아무 때나 다시 돌려도 되는 스크립트**다. 단계마다
+  "이미 되어 있으면 건너뛴다" 를 지킨다. 5단계는 `.claude/hooks/install-skills.sh` 를
+  그대로 호출한다 — 설치 목록이 두 군데로 갈라지지 않게 하려는 것이니, 새 스킬은
+  훅 쪽에만 넣는다.
+- `setup.sh` 가 사용자 설정(`~/.claude/settings.json`)에 넣는 키는 **없는 키만** 채운다.
+  이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다.
 - `skills/` 는 정션의 실체다. `~/.claude/skills` 에 무엇을 설치하든 여기로 떨어지므로,
   제3자 스킬이 저절로 미추적 파일로 나타날 수 있다. 커밋 전에 출처를 확인한다.
 
