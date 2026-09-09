@@ -11,7 +11,8 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 ## Key Files
 | File | Description |
 |------|-------------|
-| `README.md` | 제목 한 줄뿐인 자리표시자 |
+| `setup.sh` | 새 머신 부트스트랩. Claude Code 설치 확인 → 저장소 확보 → `~/.claude/skills` 링크 → 사용자 설정 병합 → 스킬 설치 → OmniRoute 설치. 멱등하다 |
+| `README.md` | 저장소 소개와 새 머신 설치 절차 |
 | `.gitignore` | `memory/` 만 제외 — 개인 메모리를 GitHub 로 올리지 않으려는 목적 |
 
 ## Subdirectories
@@ -38,6 +39,28 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   `%USERPROFILE%\.claude\settings.json`)에 같은 키를 넣거나 `/config` 의
   "Enable Remote Control for all sessions" 를 끈다. 기능 자체를 없애려면
   `disableRemoteControl: true` 를 쓴다.
+- `setup.sh` 는 최초 1회용이 아니라 **아무 때나 다시 돌려도 되는 스크립트**다. 단계마다
+  "이미 되어 있으면 건너뛴다" 를 지킨다. 5단계는 `.claude/hooks/install-skills.sh` 를
+  그대로 호출한다 — 설치 목록이 두 군데로 갈라지지 않게 하려는 것이니, 새 스킬은
+  훅 쪽에만 넣는다.
+- `setup.sh` 가 사용자 설정(`~/.claude/settings.json`)에 넣는 키는 **없는 키만** 채운다.
+  이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다. `extraKnownMarketplaces`
+  와 `enabledPlugins` 는 한 겹 더 들어가 하위 키만 채운다 — 통째로 건너뛰면 마켓플레이스가
+  하나라도 있는 순간 우리 항목이 영영 안 들어가고, 통째로 덮으면 남의 것이 사라진다.
+- **claude-mem 은 스킬이 아니라 플러그인으로 넣었다.** 기억을 쌓는 실체는 훅·워커·SQLite
+  라서 `npx skills add` 로 스킬 20개를 받아도 마크다운만 오고 조회할 것이 없다
+  (`npm install -g claude-mem` 도 SDK 만 깔린다). 그래서 훅의 `SKILLS` 배열이 아니라
+  `setup.sh` 4단계의 사용자 설정 병합으로 등록한다. 프로젝트 설정이 아니라 사용자 설정인
+  이유는, 세션 간 기억이 이 디렉터리에서만 쌓이면 쓸모가 없기 때문이다.
+- `setup.sh` 6단계의 **OmniRoute 는 해명되지 않은 보안 지적을 안은 채로 들어와 있다.**
+  Socket.dev 가 `omniroute@3.8.5` 를 공급망 점수 48 / "AI-detected potential malware" 로
+  표시했고(루트 CA 설치·DNS 조작·MITM 서버·키체인 자격증명 수집 주장),
+  [issues/2863](https://github.com/diegosouzapw/OmniRoute/issues/2863) 은 메인테이너 응답
+  없이 열려 있으며, CVE-2026-49352 가 이 프로젝트에 할당돼 있다. **사용자가 위험을 듣고
+  선택한 단계다** — 지적을 몰라서 들어온 것이 아니니 조용히 빼지 말고, 반대로 "안전하다"고
+  주석을 고쳐 쓰지도 말 것. 단계는 게이트웨이를 **설치만** 한다. `ANTHROPIC_BASE_URL` 을
+  전역으로 돌리면 평소 계정 트래픽까지 제3자 프로바이더로 새므로, 라우팅은 켜지 않는다.
+  이 기본값을 바꾸려면 사용자에게 먼저 묻는다.
 - `skills/` 는 정션의 실체다. `~/.claude/skills` 에 무엇을 설치하든 여기로 떨어지므로,
   제3자 스킬이 저절로 미추적 파일로 나타날 수 있다. 커밋 전에 출처를 확인한다.
 
