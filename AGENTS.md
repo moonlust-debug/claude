@@ -11,7 +11,7 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 ## Key Files
 | File | Description |
 |------|-------------|
-| `setup.sh` | 새 머신 부트스트랩. Claude Code 설치 확인 → 저장소 확보 → `~/.claude/skills` 링크 → 사용자 설정 병합 → 스킬 설치. 멱등하다 |
+| `setup.sh` | 새 머신 부트스트랩. Claude Code 설치 확인 → 저장소 확보 → `~/.claude/skills` 링크 → 사용자 설정 병합 → 스킬 설치 → OmniRoute 설치. 멱등하다 |
 | `README.md` | 저장소 소개와 새 머신 설치 절차 |
 | `.gitignore` | `memory/` 만 제외 — 개인 메모리를 GitHub 로 올리지 않으려는 목적 |
 
@@ -45,6 +45,15 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   훅 쪽에만 넣는다.
 - `setup.sh` 가 사용자 설정(`~/.claude/settings.json`)에 넣는 키는 **없는 키만** 채운다.
   이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다.
+- `setup.sh` 6단계의 **OmniRoute 는 해명되지 않은 보안 지적을 안은 채로 들어와 있다.**
+  Socket.dev 가 `omniroute@3.8.5` 를 공급망 점수 48 / "AI-detected potential malware" 로
+  표시했고(루트 CA 설치·DNS 조작·MITM 서버·키체인 자격증명 수집 주장),
+  [issues/2863](https://github.com/diegosouzapw/OmniRoute/issues/2863) 은 메인테이너 응답
+  없이 열려 있으며, CVE-2026-49352 가 이 프로젝트에 할당돼 있다. **사용자가 위험을 듣고
+  선택한 단계다** — 지적을 몰라서 들어온 것이 아니니 조용히 빼지 말고, 반대로 "안전하다"고
+  주석을 고쳐 쓰지도 말 것. 단계는 게이트웨이를 **설치만** 한다. `ANTHROPIC_BASE_URL` 을
+  전역으로 돌리면 평소 계정 트래픽까지 제3자 프로바이더로 새므로, 라우팅은 켜지 않는다.
+  이 기본값을 바꾸려면 사용자에게 먼저 묻는다.
 - `skills/` 는 정션의 실체다. `~/.claude/skills` 에 무엇을 설치하든 여기로 떨어지므로,
   제3자 스킬이 저절로 미추적 파일로 나타날 수 있다. 커밋 전에 출처를 확인한다.
 

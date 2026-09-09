@@ -11,6 +11,7 @@
 #   --skip-link        ~/.claude/skills 링크 단계를 건너뛴다
 #   --skip-settings    사용자 설정 병합 단계를 건너뛴다
 #   --skip-skills      개인·원격 스킬 설치 단계를 건너뛴다
+#   --skip-omniroute   OmniRoute 설치 단계를 건너뛴다
 #
 # 하는 일:
 #   1. Claude Code 확보 (없으면 공식 네이티브 인스톨러)
@@ -18,6 +19,7 @@
 #   3. ~/.claude/skills → <저장소>/skills 링크. Windows 는 정션.
 #   4. ~/.claude/settings.json 에 사용자 전역 키 병합
 #   5. .claude/hooks/install-skills.sh 재사용해 스킬 설치
+#   6. OmniRoute 게이트웨이 설치 (설치만 — 트래픽은 돌리지 않는다)
 #
 # 모든 단계는 멱등하다. 이미 되어 있으면 건너뛴다. 한 단계가 실패해도 나머지는
 # 계속 진행하고 마지막에 한 번에 보고한다 — 부트스트랩이 중간에 끊기면 어디까지
@@ -31,13 +33,23 @@ SKIP_CLAUDE=0
 SKIP_LINK=0
 SKIP_SETTINGS=0
 SKIP_SKILLS=0
+SKIP_OMNIROUTE=0
 
 done_steps=()
 skipped=()
 failed=()
 notes=()
 
-usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; }
+# 머리말 주석이 그대로 도움말이다. 줄 번호를 박아 두면 주석을 고칠 때마다
+# 어긋나므로 셰뱅 다음의 연속된 주석 블록을 끝까지 읽는다. curl | bash 로
+# 실행되면 읽을 파일이 없으므로 그때는 한 줄 요약으로 대신한다.
+usage() {
+  if [ -r "${BASH_SOURCE[0]:-}" ]; then
+    awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${BASH_SOURCE[0]}"
+  else
+    echo "사용법: setup.sh [--dir <경로>] [--skip-claude] [--skip-link] [--skip-settings] [--skip-skills] [--skip-omniroute]"
+  fi
+}
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -48,6 +60,7 @@ while [ $# -gt 0 ]; do
     --skip-link)    SKIP_LINK=1; shift ;;
     --skip-settings) SKIP_SETTINGS=1; shift ;;
     --skip-skills)  SKIP_SKILLS=1; shift ;;
+    --skip-omniroute) SKIP_OMNIROUTE=1; shift ;;
     -h|--help)      usage; exit 0 ;;
     *)              echo "오류: 알 수 없는 옵션 $1" >&2; usage >&2; exit 1 ;;
   esac
@@ -204,6 +217,34 @@ elif CLAUDE_PROJECT_DIR="$REPO_DIR" bash "$HOOK" </dev/null; then
   done_steps+=("skills(훅 실행)")
 else
   failed+=("skills")
+fi
+
+# ── 6. OmniRoute ──────────────────────────────────────────────────────────────
+# 로컬 AI 게이트웨이(localhost:20128). 설치만 하고 Claude Code 를 그리로 붙이지는
+# 않는다 — ANTHROPIC_BASE_URL 을 전역으로 돌리면 평소 쓰는 계정의 트래픽까지 전부
+# 제3자 프로바이더로 새기 때문이다. 라우팅은 필요할 때 그 셸에서만 켠다.
+#
+# 주의: 이 패키지는 해명되지 않은 보안 지적을 안고 있다. Socket.dev 가
+# omniroute@3.8.5 를 공급망 점수 48 / "AI-detected potential malware" 로 표시했고
+# (루트 CA 설치·DNS 조작·MITM 서버·키체인 자격증명 수집 주장), 해당 이슈
+# github.com/diegosouzapw/OmniRoute/issues/2863 는 메인테이너 응답 없이 열려 있다.
+# CVE-2026-49352 도 이 프로젝트에 할당돼 있다. 위험을 알고 넣은 단계다.
+# 빼려면 --skip-omniroute, 이미 깔았으면 npm uninstall -g omniroute.
+if [ "$SKIP_OMNIROUTE" -eq 1 ]; then
+  skipped+=("omniroute(요청)")
+elif have omniroute; then
+  skipped+=("omniroute")
+elif ! have npm; then
+  failed+=("omniroute")
+  notes+=("npm 이 없어 omniroute 를 설치하지 못했습니다.")
+elif npm install -g omniroute </dev/null >>"$LOG" 2>&1 && have omniroute; then
+  done_steps+=("omniroute")
+else
+  failed+=("omniroute")
+fi
+
+if have omniroute; then
+  notes+=("omniroute 는 설치만 됐습니다. 쓸 때만: 한 셸에서 omniroute, 다른 셸에서 ANTHROPIC_BASE_URL=http://localhost:20128/v1 claude")
 fi
 
 # ── 보고 ──────────────────────────────────────────────────────────────────────
