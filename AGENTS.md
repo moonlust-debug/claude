@@ -47,6 +47,13 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다. `extraKnownMarketplaces`
   와 `enabledPlugins` 는 한 겹 더 들어가 하위 키만 채운다 — 통째로 건너뛰면 마켓플레이스가
   하나라도 있는 순간 우리 항목이 영영 안 들어가고, 통째로 덮으면 남의 것이 사라진다.
+- **Headroom 은 스킬이 아니다** — 저장소에 `SKILL.md` 가 하나도 없다(`npx skills add
+  headroomlabs-ai/headroom --list` → "No skills found"). 레지스트리에 `headroom` 이라는
+  이름으로 올라온 것들은 제3자 사본이니 공식으로 착각하지 말 것. 실체는 파이썬 CLI
+  (`headroom-ai`)와 그것을 부르는 플러그인 훅이다. 그래서 4단계가 CLI 를 깔고,
+  5단계는 **`have headroom` 일 때만** 플러그인을 켠다. 훅이 SessionStart 와 모든
+  Bash·PowerShell 호출마다 `headroom init hook ensure` 를 부르므로, CLI 없이 플러그인만
+  켜면 매 도구 호출에 실패하는 훅이 붙는다. 이 순서와 조건을 뒤집지 말 것.
 - **claude-mem 은 스킬이 아니라 플러그인으로 넣었다.** 기억을 쌓는 실체는 훅·워커·SQLite
   라서 `npx skills add` 로 스킬 20개를 받아도 마크다운만 오고 조회할 것이 없다
   (`npm install -g claude-mem` 도 SDK 만 깔린다). 그래서 훅의 `SKILLS` 배열이 아니라
@@ -80,6 +87,7 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 ### External
 - Claude Code (native, Windows) — 이 저장소가 설정하는 대상
 - `bun` — 텔레그램 MCP 서버 런타임
+- `uv` 또는 `pip3` — `setup.sh` 4단계가 Headroom CLI(`headroom-ai`)를 까는 경로
 - `npx skills` — 개인 스킬 설치 경로
 - GitHub 원격: https://github.com/moonlust-debug/claude
 

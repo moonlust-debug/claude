@@ -9,6 +9,7 @@
 #   --dir <경로>       저장소를 둘 위치 (클론이 필요할 때만 쓰임, 기본 $HOME/claude)
 #   --skip-claude      Claude Code 설치 단계를 건너뛴다
 #   --skip-link        ~/.claude/skills 링크 단계를 건너뛴다
+#   --skip-headroom    Headroom CLI 설치 단계를 건너뛴다
 #   --skip-settings    사용자 설정 병합 단계를 건너뛴다
 #   --skip-skills      개인·원격 스킬 설치 단계를 건너뛴다
 #   --skip-omniroute   OmniRoute 설치 단계를 건너뛴다
@@ -17,9 +18,11 @@
 #   1. Claude Code 확보 (없으면 공식 네이티브 인스톨러)
 #   2. 이 저장소 확보 (curl 로 실행돼 사본이 없으면 클론)
 #   3. ~/.claude/skills → <저장소>/skills 링크. Windows 는 정션.
-#   4. ~/.claude/settings.json 에 사용자 전역 키 병합 (claude-mem 플러그인 포함)
-#   5. .claude/hooks/install-skills.sh 재사용해 스킬 설치
-#   6. OmniRoute 게이트웨이 설치 (설치만 — 트래픽은 돌리지 않는다)
+#   4. Headroom CLI 확보 (uv 또는 pip)
+#   5. ~/.claude/settings.json 에 사용자 전역 키 병합
+#      (claude-mem 플러그인, headroom 플러그인 — CLI 가 잡힐 때만)
+#   6. .claude/hooks/install-skills.sh 재사용해 스킬 설치
+#   7. OmniRoute 게이트웨이 설치 (설치만 — 트래픽은 돌리지 않는다)
 #
 # 모든 단계는 멱등하다. 이미 되어 있으면 건너뛴다. 한 단계가 실패해도 나머지는
 # 계속 진행하고 마지막에 한 번에 보고한다 — 부트스트랩이 중간에 끊기면 어디까지
@@ -33,6 +36,7 @@ SKIP_CLAUDE=0
 SKIP_LINK=0
 SKIP_SETTINGS=0
 SKIP_SKILLS=0
+SKIP_HEADROOM=0
 SKIP_OMNIROUTE=0
 
 done_steps=()
@@ -47,7 +51,7 @@ usage() {
   if [ -r "${BASH_SOURCE[0]:-}" ]; then
     awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${BASH_SOURCE[0]}"
   else
-    echo "사용법: setup.sh [--dir <경로>] [--skip-claude] [--skip-link] [--skip-settings] [--skip-skills] [--skip-omniroute]"
+    echo "사용법: setup.sh [--dir <경로>] [--skip-claude] [--skip-link] [--skip-headroom] [--skip-settings] [--skip-skills] [--skip-omniroute]"
   fi
 }
 
@@ -60,6 +64,7 @@ while [ $# -gt 0 ]; do
     --skip-link)    SKIP_LINK=1; shift ;;
     --skip-settings) SKIP_SETTINGS=1; shift ;;
     --skip-skills)  SKIP_SKILLS=1; shift ;;
+    --skip-headroom) SKIP_HEADROOM=1; shift ;;
     --skip-omniroute) SKIP_OMNIROUTE=1; shift ;;
     -h|--help)      usage; exit 0 ;;
     *)              echo "오류: 알 수 없는 옵션 $1" >&2; usage >&2; exit 1 ;;
@@ -163,7 +168,42 @@ else
   fi
 fi
 
-# ── 4. 사용자 설정 병합 ───────────────────────────────────────────────────────
+# ── 4. Headroom CLI ───────────────────────────────────────────────────────────
+# Headroom 은 스킬이 아니다 — 저장소에 SKILL.md 가 하나도 없다. 실체는 파이썬
+# CLI(`headroom-ai`)와 그것을 부르는 플러그인 훅이다. 그래서 CLI 를 먼저 깔고,
+# 다음 단계에서 CLI 가 실제로 잡힐 때만 플러그인을 켠다 — 훅이 SessionStart 와
+# 모든 Bash 호출마다 `headroom` 을 부르기 때문에, CLI 없이 플러그인만 켜면
+# 매 도구 호출이 실패한 훅을 달고 다닌다.
+#
+# extras 는 [proxy,code] 로 간다. README 가 [proxy] 를 "most common install" 로
+# 부르고, [code] 가 간판 기능인 tree-sitter AST 압축이다. [all] 은 [ml] 을 통해
+# torch 를 끌어와 수 GB 가 되므로 부트스트랩에는 맞지 않는다. 필요하면 나중에
+# uv tool install --python 3.13 "headroom-ai[all]" 로 덮어쓰면 된다.
+if [ "$SKIP_HEADROOM" -eq 1 ]; then
+  skipped+=("headroom(요청)")
+elif have headroom; then
+  skipped+=("headroom")
+else
+  if have uv; then
+    uv tool install --python 3.13 "headroom-ai[proxy,code]" </dev/null >>"$LOG" 2>&1
+  elif have pip3; then
+    pip3 install --user "headroom-ai[proxy,code]" </dev/null >>"$LOG" 2>&1
+  elif have pip; then
+    pip install --user "headroom-ai[proxy,code]" </dev/null >>"$LOG" 2>&1
+  fi
+  # uv tool install 도 pip --user 도 ~/.local/bin 에 떨어뜨린다. 지금 셸의 PATH
+  # 에는 없을 수 있으므로 붙여 두고 다시 확인한다.
+  export PATH="$HOME/.local/bin:$PATH"
+  if have headroom; then
+    done_steps+=("headroom")
+    notes+=("headroom 은 CLI·플러그인만 깔았습니다. 압축을 켜려면: headroom deploy (또는 headroom wrap claude), 확인은 headroom doctor")
+  else
+    failed+=("headroom")
+    notes+=("headroom 설치 실패. uv 나 pip3 가 있는지 보고 직접: uv tool install --python 3.13 \"headroom-ai[proxy,code]\"")
+  fi
+fi
+
+# ── 5. 사용자 설정 병합 ───────────────────────────────────────────────────────
 # 이 저장소의 프로젝트 설정은 여기서 `claude` 를 띄울 때만 유효하다.
 # 모든 디렉터리에 걸려야 하는 키만 사용자 설정으로 올린다.
 #
@@ -182,6 +222,20 @@ USER_KEYS='{
   },
   "enabledPlugins": { "claude-mem@thedotmack": true }
 }'
+
+# headroom 플러그인은 CLI 가 실제로 잡힐 때만 켠다. 훅이 SessionStart 와 모든
+# Bash·PowerShell 호출마다 `headroom init hook ensure` 를 부르므로, CLI 가 없으면
+# 세션 내내 실패하는 훅이 붙는다. 그래서 앞 단계가 성공했을 때만 등록한다.
+HEADROOM_KEYS='{}'
+if have headroom; then
+  HEADROOM_KEYS='{
+    "extraKnownMarketplaces": {
+      "headroom-marketplace": { "source": { "source": "github", "repo": "headroomlabs-ai/headroom" } }
+    },
+    "enabledPlugins": { "headroom@headroom-marketplace": true }
+  }'
+fi
+
 if [ "$SKIP_SETTINGS" -eq 1 ]; then
   skipped+=("settings(요청)")
 elif ! have node; then
@@ -213,10 +267,16 @@ else
       const raw = fs.readFileSync(p, "utf8").trim();
       if (raw) { try { cur = JSON.parse(raw); } catch (e) { process.exit(2); } }
     }
-    if (!fill(cur, JSON.parse(process.argv[2]))) process.exit(3);
+    // argv[2..] 는 병합할 JSON 덩어리들. 조건부로 켜지는 것(headroom)이 있어서
+    // 하나로 합쳐 넘기지 않고 여러 개를 받는다.
+    let changed = false;
+    for (const blob of process.argv.slice(2)) {
+      if (fill(cur, JSON.parse(blob))) changed = true;
+    }
+    if (!changed) process.exit(3);
     fs.mkdirSync(path.dirname(p), { recursive: true });
     fs.writeFileSync(p, JSON.stringify(cur, null, 2) + "\n");
-  ' "$USER_SETTINGS" "$USER_KEYS" </dev/null >>"$LOG" 2>&1
+  ' "$USER_SETTINGS" "$USER_KEYS" "$HEADROOM_KEYS" </dev/null >>"$LOG" 2>&1
   case $? in
     0) done_steps+=("settings") ;;
     3) skipped+=("settings") ;;
@@ -226,7 +286,7 @@ else
   esac
 fi
 
-# ── 5. 스킬 ───────────────────────────────────────────────────────────────────
+# ── 6. 스킬 ───────────────────────────────────────────────────────────────────
 # SessionStart 훅과 같은 스크립트를 그대로 부른다. 설치 목록이 두 군데로
 # 갈라지지 않게 하려는 것이다.
 HOOK="$REPO_DIR/.claude/hooks/install-skills.sh"
@@ -241,7 +301,7 @@ else
   failed+=("skills")
 fi
 
-# ── 6. OmniRoute ──────────────────────────────────────────────────────────────
+# ── 7. OmniRoute ──────────────────────────────────────────────────────────────
 # 로컬 AI 게이트웨이(localhost:20128). 설치만 하고 Claude Code 를 그리로 붙이지는
 # 않는다 — ANTHROPIC_BASE_URL 을 전역으로 돌리면 평소 쓰는 계정의 트래픽까지 전부
 # 제3자 프로바이더로 새기 때문이다. 라우팅은 필요할 때 그 셸에서만 켠다.

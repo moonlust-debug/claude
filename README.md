@@ -32,6 +32,28 @@ curl -fsSL https://raw.githubusercontent.com/moonlust-debug/claude/main/setup.sh
 SQLite 가 빠져서 조회할 것이 없다. 같은 이유로 `npm install -g claude-mem` 도
 SDK 만 깔리므로 쓰지 않는다.
 
+## Headroom
+
+4단계가 [Headroom](https://github.com/headroomlabs-ai/headroom) CLI 를 깔고,
+5단계가 `headroom` 이 실제로 잡힐 때만 플러그인(`headroom@headroom-marketplace`)을
+켠다. 플러그인 훅이 SessionStart 와 모든 Bash 호출마다 `headroom` 을 부르기
+때문에, CLI 없이 플러그인만 켜면 매 도구 호출에 실패하는 훅이 붙는다.
+
+**Headroom 은 스킬이 아니다.** 저장소에 `SKILL.md` 가 하나도 없다. 스킬 레지스트리에
+`headroom` 이라는 이름으로 올라온 것들은 공식이 아닌 제3자 사본이다.
+
+설치는 CLI·플러그인까지다. 압축은 켜야 동작한다:
+
+```sh
+headroom deploy        # 로컬 배포 + 에이전트 설정 (또는 headroom wrap claude)
+headroom doctor        # 라우팅이 실제로 걸렸는지 확인
+```
+
+extras 는 `[proxy,code]` 로 깐다 — README 가 `[proxy]` 를 "most common install" 로
+부르고, `[code]` 가 간판 기능인 tree-sitter AST 압축이다. `[all]` 은 `[ml]` 을 통해
+torch 를 끌어와 수 GB 가 되므로 부트스트랩에서는 피한다. 필요하면
+`uv tool install --python 3.13 "headroom-ai[all]"` 로 덮어쓰면 된다.
+
 ## OmniRoute
 
 6단계는 [OmniRoute](https://github.com/diegosouzapw/OmniRoute) 게이트웨이를
