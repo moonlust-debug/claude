@@ -17,7 +17,7 @@
 #   1. Claude Code 확보 (없으면 공식 네이티브 인스톨러)
 #   2. 이 저장소 확보 (curl 로 실행돼 사본이 없으면 클론)
 #   3. ~/.claude/skills → <저장소>/skills 링크. Windows 는 정션.
-#   4. ~/.claude/settings.json 에 사용자 전역 키 병합
+#   4. ~/.claude/settings.json 에 사용자 전역 키 병합 (claude-mem 플러그인 포함)
 #   5. .claude/hooks/install-skills.sh 재사용해 스킬 설치
 #   6. OmniRoute 게이트웨이 설치 (설치만 — 트래픽은 돌리지 않는다)
 #
@@ -169,8 +169,19 @@ fi
 #
 # remoteControlAtStartup=false: 켜져 있으면 `claude` 를 띄울 때마다
 # <호스트명>-<단어>-<단어> 이름의 Remote Control 세션이 claude.ai 목록에 쌓인다.
+#
+# claude-mem: 세션 간 기억을 쌓는 플러그인. 스킬 파일만으로는 동작하지 않고
+# 훅·워커·SQLite 가 필요해서 플러그인으로 넣는다. 이 저장소의 프로젝트 설정이
+# 아니라 사용자 설정에 넣는 이유는, 기억이 이 디렉터리에서만 쌓이면 쓸모가
+# 없기 때문이다.
 USER_SETTINGS="$HOME/.claude/settings.json"
-USER_KEYS='{"remoteControlAtStartup": false}'
+USER_KEYS='{
+  "remoteControlAtStartup": false,
+  "extraKnownMarketplaces": {
+    "thedotmack": { "source": { "source": "github", "repo": "thedotmack/claude-mem" } }
+  },
+  "enabledPlugins": { "claude-mem@thedotmack": true }
+}'
 if [ "$SKIP_SETTINGS" -eq 1 ]; then
   skipped+=("settings(요청)")
 elif ! have node; then
@@ -179,19 +190,30 @@ elif ! have node; then
 else
   # 파일 통째 교체는 금물이다 — 훅·플러그인 설정이 조용히 사라진다.
   # 이미 있는 키는 사용자가 일부러 넣은 값으로 보고 건드리지 않는다.
+  # 객체 키(extraKnownMarketplaces·enabledPlugins)는 한 겹 더 들어가 하위 키만
+  # 채운다. 통째로 건너뛰면 마켓플레이스가 하나라도 있는 순간 우리 항목이
+  # 영영 안 들어가고, 통째로 덮으면 남의 마켓플레이스가 사라진다.
   node -e '
     const fs = require("fs"), path = require("path");
     const p = process.argv[1];
+    const isPlain = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+
+    // 없는 키만 채운다. 값이 양쪽 다 객체면 그 안으로 내려가 같은 규칙을 쓴다.
+    function fill(cur, want) {
+      let changed = false;
+      for (const [k, v] of Object.entries(want)) {
+        if (!(k in cur)) { cur[k] = v; changed = true; }
+        else if (isPlain(v) && isPlain(cur[k]) && fill(cur[k], v)) { changed = true; }
+      }
+      return changed;
+    }
+
     let cur = {};
     if (fs.existsSync(p)) {
       const raw = fs.readFileSync(p, "utf8").trim();
       if (raw) { try { cur = JSON.parse(raw); } catch (e) { process.exit(2); } }
     }
-    let changed = false;
-    for (const [k, v] of Object.entries(JSON.parse(process.argv[2]))) {
-      if (!(k in cur)) { cur[k] = v; changed = true; }
-    }
-    if (!changed) process.exit(3);
+    if (!fill(cur, JSON.parse(process.argv[2]))) process.exit(3);
     fs.mkdirSync(path.dirname(p), { recursive: true });
     fs.writeFileSync(p, JSON.stringify(cur, null, 2) + "\n");
   ' "$USER_SETTINGS" "$USER_KEYS" </dev/null >>"$LOG" 2>&1

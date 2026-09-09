@@ -20,6 +20,18 @@ curl -fsSL https://raw.githubusercontent.com/moonlust-debug/claude/main/setup.sh
 사용자 설정 병합 → 개인·원격 스킬 설치 → OmniRoute 설치를 순서대로 하고, 이미
 되어 있는 단계는 건너뛴다. 여러 번 돌려도 안전하다. 옵션은 `./setup.sh --help` 참고.
 
+## claude-mem
+
+4단계가 [claude-mem](https://github.com/thedotmack/claude-mem) 플러그인을
+사용자 설정(`~/.claude/settings.json`)에 등록한다. 세션 간 기억을 쌓는 플러그인이라
+이 저장소 안에서만 켜면 쓸모가 없어서 전역으로 넣는다. `claude` 를 다시 띄우면
+마켓플레이스에서 받아 붙는다.
+
+스킬(`mem-search`, `standup`, `timeline-report` 등 20개)은 플러그인이 함께
+제공한다. `npx skills add` 로 스킬만 깔면 마크다운만 오고 기억을 쌓는 훅·워커·
+SQLite 가 빠져서 조회할 것이 없다. 같은 이유로 `npm install -g claude-mem` 도
+SDK 만 깔리므로 쓰지 않는다.
+
 ## OmniRoute
 
 6단계는 [OmniRoute](https://github.com/diegosouzapw/OmniRoute) 게이트웨이를

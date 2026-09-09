@@ -44,7 +44,14 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   그대로 호출한다 — 설치 목록이 두 군데로 갈라지지 않게 하려는 것이니, 새 스킬은
   훅 쪽에만 넣는다.
 - `setup.sh` 가 사용자 설정(`~/.claude/settings.json`)에 넣는 키는 **없는 키만** 채운다.
-  이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다.
+  이미 있는 값은 사용자가 일부러 넣은 것으로 보고 건드리지 않는다. `extraKnownMarketplaces`
+  와 `enabledPlugins` 는 한 겹 더 들어가 하위 키만 채운다 — 통째로 건너뛰면 마켓플레이스가
+  하나라도 있는 순간 우리 항목이 영영 안 들어가고, 통째로 덮으면 남의 것이 사라진다.
+- **claude-mem 은 스킬이 아니라 플러그인으로 넣었다.** 기억을 쌓는 실체는 훅·워커·SQLite
+  라서 `npx skills add` 로 스킬 20개를 받아도 마크다운만 오고 조회할 것이 없다
+  (`npm install -g claude-mem` 도 SDK 만 깔린다). 그래서 훅의 `SKILLS` 배열이 아니라
+  `setup.sh` 4단계의 사용자 설정 병합으로 등록한다. 프로젝트 설정이 아니라 사용자 설정인
+  이유는, 세션 간 기억이 이 디렉터리에서만 쌓이면 쓸모가 없기 때문이다.
 - `setup.sh` 6단계의 **OmniRoute 는 해명되지 않은 보안 지적을 안은 채로 들어와 있다.**
   Socket.dev 가 `omniroute@3.8.5` 를 공급망 점수 48 / "AI-detected potential malware" 로
   표시했고(루트 CA 설치·DNS 조작·MITM 서버·키체인 자격증명 수집 주장),
