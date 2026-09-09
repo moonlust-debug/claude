@@ -53,6 +53,9 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# curl | bash 로 실행되면 이 스크립트의 본문 자체가 stdin 이다. 자식 프로세스가
+# stdin 을 읽어 버리면(예: npx 는 실제로 읽는다) 남은 본문이 통째로 사라져 스크립트가
+# 조용히 중간에 끝난다. 그래서 아래 모든 외부 명령에 </dev/null 을 붙인다.
 have() { command -v "$1" >/dev/null 2>&1; }
 
 # 두 경로가 결국 같은 곳을 가리키는지. 심링크든 Windows 정션이든 cd 뒤 `pwd -P`
@@ -81,7 +84,7 @@ else
     # 네이티브 Windows 는 PowerShell 인스톨러가 정답이므로 안내만 한다.
     failed+=("claude")
     notes+=("Windows 는 PowerShell 에서: irm https://claude.ai/install.ps1 | iex")
-  elif have curl && curl -fsSL https://claude.ai/install.sh | bash >>"$LOG" 2>&1; then
+  elif have curl && curl -fsSL https://claude.ai/install.sh </dev/null | bash >>"$LOG" 2>&1; then
     # 인스톨러는 ~/.local/bin 에 깔지만 현재 셸의 PATH 에는 아직 없을 수 있다.
     export PATH="$HOME/.local/bin:$PATH"
     if have claude; then
@@ -109,7 +112,7 @@ if [ -n "$REPO_DIR" ]; then
 elif [ -d "$CLONE_DIR/.git" ]; then
   REPO_DIR="$CLONE_DIR"
   skipped+=("repo($REPO_DIR)")
-elif have git && git clone "$REMOTE" "$CLONE_DIR" >>"$LOG" 2>&1; then
+elif have git && git clone "$REMOTE" "$CLONE_DIR" </dev/null >>"$LOG" 2>&1; then
   REPO_DIR="$CLONE_DIR"
   done_steps+=("repo($REPO_DIR)")
 else
@@ -136,9 +139,9 @@ elif [ -e "$SKILLS_LINK" ] && ! rmdir "$SKILLS_LINK" 2>/dev/null; then
 else
   mkdir -p "$HOME/.claude"
   if is_windows; then
-    cmd //c mklink /J "$(cygpath -w "$SKILLS_LINK")" "$(cygpath -w "$REPO_DIR/skills")" >>"$LOG" 2>&1
+    cmd //c mklink /J "$(cygpath -w "$SKILLS_LINK")" "$(cygpath -w "$REPO_DIR/skills")" </dev/null >>"$LOG" 2>&1
   else
-    ln -s "$REPO_DIR/skills" "$SKILLS_LINK" >>"$LOG" 2>&1
+    ln -s "$REPO_DIR/skills" "$SKILLS_LINK" </dev/null >>"$LOG" 2>&1
   fi
   if same_path "$SKILLS_LINK" "$REPO_DIR/skills"; then
     done_steps+=("skills-link")
@@ -178,7 +181,7 @@ else
     if (!changed) process.exit(3);
     fs.mkdirSync(path.dirname(p), { recursive: true });
     fs.writeFileSync(p, JSON.stringify(cur, null, 2) + "\n");
-  ' "$USER_SETTINGS" "$USER_KEYS" >>"$LOG" 2>&1
+  ' "$USER_SETTINGS" "$USER_KEYS" </dev/null >>"$LOG" 2>&1
   case $? in
     0) done_steps+=("settings") ;;
     3) skipped+=("settings") ;;
@@ -196,7 +199,7 @@ if [ "$SKIP_SKILLS" -eq 1 ]; then
   skipped+=("skills(요청)")
 elif [ -z "$REPO_DIR" ] || [ ! -f "$HOOK" ]; then
   failed+=("skills")
-elif CLAUDE_PROJECT_DIR="$REPO_DIR" bash "$HOOK"; then
+elif CLAUDE_PROJECT_DIR="$REPO_DIR" bash "$HOOK" </dev/null; then
   # 훅은 실제로 설치한 스킬만 자기 손으로 한 줄 보고한다.
   done_steps+=("skills(훅 실행)")
 else
