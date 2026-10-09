@@ -1,2 +1,9 @@
 memory/
 .omc/
+
+# Skills installed by plugins/tools through the ~/.claude/skills junction
+skills/gsd-*/
+skills/skill-creator/
+
+# Screenshots dropped in the repo root
+/*_Snapshot.jpg
