@@ -6,7 +6,7 @@
 ## Purpose
 `.claude/settings.json` 의 `SessionStart` 훅으로 등록된 설치 스크립트들이다.
 웹/원격 세션은 매번 새 컨테이너로 뜨기 때문에 전 세션에서 설치한 것이 남아 있지 않다.
-두 스크립트 모두 "없으면 설치하고, 있으면 즉시 빠져나온다"는 형태라 로컬 세션에서는
+스크립트들은 모두 "없으면 설치하고, 있으면 즉시 빠져나온다"는 형태라 로컬 세션에서는
 비용이 사실상 0이다.
 
 ## Key Files
@@ -14,6 +14,7 @@
 |------|-------------|
 | `install-skills.sh` | 개인 스킬 확보. ①`npx skills add` 로 원격 스킬 설치(현재 `anthropics/skills:skill-creator`) ②저장소의 `skills/` 를 `$SKILLS_DIR` 로 복사 |
 | `install-video-deps.sh` | `/watch` 플러그인(watch@claude-video)이 필요한 `ffmpeg`·`ffprobe`·`yt-dlp` 확보 |
+| `install-codex.sh` | ChatGPT 이미지 생성용 Codex CLI(`@openai/codex`) 확보. 로그인(`~/.codex/auth.json`)은 컨테이너와 함께 사라지므로 새 웹 세션마다 `codex login --device-auth` 필요 |
 
 ## Subdirectories
 없음.
