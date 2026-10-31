@@ -39,6 +39,10 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
   `%USERPROFILE%\.claude\settings.json`)에 같은 키를 넣거나 `/config` 의
   "Enable Remote Control for all sessions" 를 끈다. 기능 자체를 없애려면
   `disableRemoteControl: true` 를 쓴다.
+- 이미지 생성 요청은 `codex exec` 로 만들어 `images/` 에 저장하고, 커밋·푸시 → PR 생성 →
+  **확인 없이 바로 머지**까지 한 번에 끝낸다(사용자 지시, 2026-10-31). PC 쪽은 작업
+  스케줄러의 `git pull` 로 `D:\claude\images\` 에 자동으로 받는다. 단, PR 에 이미지 외
+  변경(설정·스크립트 등)이 섞이면 자동 머지하지 말고 확인을 받는다.
 - `skills/` 는 정션의 실체다. `~/.claude/skills` 에 무엇을 설치하든 여기로 떨어지므로,
   제3자 스킬이 저절로 미추적 파일로 나타날 수 있다. 커밋 전에 출처를 확인한다.
 
