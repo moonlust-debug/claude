@@ -13,6 +13,7 @@ SKILLS_DIR="$HOME/.claude/skills"
 SKILLS=(
   "anthropics/skills:skill-creator"
   "anthropics/skills:frontend-design"
+  "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max"
 )
 
 installed=()
