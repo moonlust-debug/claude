@@ -19,6 +19,8 @@ SKILLS=(
   "vercel-labs/agent-skills:web-design-guidelines"
   "vercel-labs/skills:find-skills"
   "Leonxlnx/taste-skill:design-taste-frontend"
+  "vercel-labs/agent-browser:agent-browser"
+  "jakeschincariol/claude-illegal-codes:aura-farming"
 )
 
 installed=()
