@@ -12,6 +12,7 @@ SKILLS_DIR="$HOME/.claude/skills"
 # repo:skill pairs to install, one per line.
 SKILLS=(
   "anthropics/skills:skill-creator"
+  "anthropics/skills:frontend-design"
 )
 
 installed=()
