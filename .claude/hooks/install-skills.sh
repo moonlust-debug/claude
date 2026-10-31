@@ -17,6 +17,7 @@ SKILLS=(
   "nutlope/hallmark:hallmark"
   "emilkowalski/skills:emil-design-eng"
   "vercel-labs/agent-skills:web-design-guidelines"
+  "vercel-labs/skills:find-skills"
 )
 
 installed=()
