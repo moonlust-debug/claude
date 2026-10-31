@@ -21,6 +21,7 @@ SKILLS=(
   "Leonxlnx/taste-skill:design-taste-frontend"
   "vercel-labs/agent-browser:agent-browser"
   "jakeschincariol/claude-illegal-codes:aura-farming"
+  "jakeschincariol/claude-illegal-codes:67"
 )
 
 installed=()
