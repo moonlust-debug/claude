@@ -21,6 +21,7 @@ New-Item -ItemType Junction -Path C:\Users\moonl\.claude\skills -Target D:\claud
 | Directory | Purpose |
 |-----------|---------|
 | `memory-save/` | 자체 제작. 세션의 지속 가치 있는 사실을 사실 단위 파일로 `D:\claude\memory` 에 저장 |
+| `code-video/` | 자체 제작. HTML/CSS/Canvas 로 애니메이션을 짜고 Playwright 로 프레임별 캡처 → ffmpeg 로 MP4 렌더 |
 | `task-observer/` | 제3자(rebelytics/one-skill-to-rule-them-all). 작업 중 스킬화할 패턴 관찰 |
 | `wiki/` | oh-my-claudecode 5.0.0 이 설치. 세션 간 누적되는 마크다운 지식베이스 |
 
