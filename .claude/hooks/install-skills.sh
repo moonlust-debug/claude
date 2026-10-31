@@ -18,6 +18,7 @@ SKILLS=(
   "emilkowalski/skills:emil-design-eng"
   "vercel-labs/agent-skills:web-design-guidelines"
   "vercel-labs/skills:find-skills"
+  "Leonxlnx/taste-skill:design-taste-frontend"
 )
 
 installed=()
