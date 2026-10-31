@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  Starter for a code-rendered video. Copy it, then replace SCENES.
+  Everything on screen is a pure function of t (seconds): no setTimeout,
+  no requestAnimationFrame, no Math.random() without a seed. That is what lets
+  render.mjs step through frames and get the same video every time.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0d0f; --fg: #f4f1ea; --accent: #ff5a1f; --muted: #8a8780; }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--fg);
+    font-family: Inter, "Noto Sans KR", system-ui, sans-serif; }
+  #stage { position: absolute; inset: 0; }
+  .layer { position: absolute; will-change: transform, opacity; }
+  .title { font-size: 9vw; font-weight: 900; letter-spacing: -0.04em; line-height: 0.95; }
+  .sub { font-size: 2.4vw; color: var(--muted); }
+  .bar { height: 1.2vh; background: var(--accent); transform-origin: left center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer title" id="t1" style="left:8vw; top:30vh">한 줄로<br>말하는 제품</div>
+  <div class="layer sub" id="s1" style="left:8vw; top:62vh">코드로 그린 영상 · 16:9</div>
+  <div class="layer bar" id="b1" style="left:8vw; top:72vh; width:40vw"></div>
+  <div class="layer title" id="t2" style="left:8vw; top:38vh; color: var(--accent)">끝.</div>
+</div>
+<script>
+  // Total length in seconds. render.mjs reads this.
+  window.DURATION = 6;
+
+  // Easing and interpolation helpers.
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const ease = {
+    outExpo: (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x)),
+    inOutCubic: (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+    outBack: (x) => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2),
+  };
+  // Progress of t through [start, start + dur], eased.
+  const p = (t, start, dur, fn = ease.outExpo) => fn(clamp((t - start) / dur));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const $ = (id) => document.getElementById(id);
+  const set = (el, { x = 0, y = 0, s = 1, r = 0, o = 1 }) => {
+    el.style.transform = `translate(${x}px, ${y}px) scale(${s}) rotate(${r}deg)`;
+    el.style.opacity = o;
+  };
+
+  // One function per scene, each given local time and its own progress helpers.
+  window.renderFrame = (t) => {
+    // Scene 1: 0s to 4s
+    const inT = p(t, 0.2, 0.9), outT = p(t, 3.4, 0.6, ease.inOutCubic);
+    set($('t1'), { y: lerp(80, 0, inT) - outT * 60, o: inT * (1 - outT) });
+    set($('s1'), { y: lerp(40, 0, p(t, 0.6, 0.9)), o: p(t, 0.6, 0.9) * (1 - outT) });
+    $('b1').style.transform = `scaleX(${p(t, 0.9, 1.4, ease.inOutCubic) * (1 - outT)})`;
+
+    // Scene 2: 4s to 6s
+    const k = p(t, 4.0, 0.8, ease.outBack);
+    set($('t2'), { s: lerp(0.6, 1, k), o: clamp(k * 1.5) });
+  };
+  window.renderFrame(0);
+</script>
+</body>
+</html>

@@ -21,6 +21,7 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 | `telegram/` | 텔레그램 채널 플러그인 설치 스크립트와 프록시 우회 기록 (see `telegram/AGENTS.md`) |
 | `skills/` | 개인 스킬 실체. `~/.claude/skills` 가 정션으로 여기를 가리킨다 (see `skills/AGENTS.md`) |
 | `images/` | Codex(ChatGPT)로 생성한 이미지 보관. 웹 세션 컨테이너는 사라지므로 남길 이미지는 여기로 옮겨 커밋한다. 파일명은 `YYYY-MM-DD-<설명>.png` |
+| `videos/` | `code-video` 스킬로 렌더한 MP4 와 원본 HTML 보관. 파일명은 `YYYY-MM-DD-<설명>.mp4` |
 | `memory/` | 세션 간 기억. `.gitignore` 로 추적 제외 — 문서화 대상 아님 |
 | `.omc/` | oh-my-claudecode 가 만드는 세션 상태. 자동 생성물이라 문서화 대상 아님 |
 
