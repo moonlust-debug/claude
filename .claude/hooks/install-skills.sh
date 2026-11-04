@@ -51,6 +51,7 @@ SKILLS=(
   "vercel-labs/agent-browser:agent-browser"
   "jakeschincariol/claude-illegal-codes:aura-farming"
   "jakeschincariol/claude-illegal-codes:67"
+  "Leonxlnx/earshot:earshot"
   "Leonxlnx/earshot:real-sound"
 )
 
