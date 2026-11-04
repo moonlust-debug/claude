@@ -63,7 +63,6 @@
       "WebFetch",
       "Edit",
       "Write",
-
       "Bash(pwd)",
       "Bash(ls:*)",
       "Bash(tree:*)",
@@ -89,7 +88,6 @@
       "Bash(touch:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
-
       "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
@@ -116,10 +114,8 @@
       "Bash(git revert:*)",
       "Bash(git tag:*)",
       "Bash(git push:*)",
-
       "Bash(curl:*)",
       "Bash(wget:*)",
-
       "Bash(npm test:*)",
       "Bash(npm run:*)",
       "Bash(npm install:*)",
@@ -129,14 +125,12 @@
       "Bash(yarn:*)",
       "Bash(bun:*)",
       "Bash(node:*)",
-
       "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(pytest:*)",
       "Bash(pip install:*)",
       "Bash(ruff:*)",
       "Bash(mypy:*)",
-
       "Bash(go test:*)",
       "Bash(go vet:*)",
       "Bash(go build:*)",
@@ -155,10 +149,17 @@
         "source": "github",
         "repo": "bradautomates/claude-video"
       }
+    },
+    "moonlust": {
+      "source": {
+        "source": "github",
+        "repo": "moonlust-debug/claude"
+      }
     }
   },
   "enabledPlugins": {
-    "watch@claude-video": true
+    "watch@claude-video": true,
+    "earshot@moonlust": true
   },
   "hooks": {
     "SessionStart": [
