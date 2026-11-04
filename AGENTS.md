@@ -17,6 +17,7 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 ## Subdirectories
 | Directory | Purpose |
 |-----------|---------|
+| `.claude-plugin/` | 이 저장소를 `moonlust` marketplace 로 쓰기 위한 `marketplace.json`. 상류 저장소에 marketplace 정의가 없어 README 의 `/plugin marketplace add` 로는 등록이 안 되는 플러그인(earshot)을 여기서 대신 나열한다 |
 | `.claude/` | 이 저장소의 프로젝트 설정과 SessionStart 훅 (see `.claude/hooks/AGENTS.md`) |
 | `telegram/` | 텔레그램 채널 플러그인 설치 스크립트와 프록시 우회 기록 (see `telegram/AGENTS.md`) |
 | `skills/` | 개인 스킬 실체. `~/.claude/skills` 가 정션으로 여기를 가리킨다 (see `skills/AGENTS.md`) |
