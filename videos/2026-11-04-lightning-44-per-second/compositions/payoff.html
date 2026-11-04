@@ -1,0 +1,28 @@
+<template>
+  <style>
+    @font-face { font-family: "Noto Sans KR"; src: url("assets/fonts/NotoSansKR.ttf"); font-weight: 100 900; }
+    #root { position: absolute; inset: 0; font-family: 'Noto Sans KR', sans-serif; color: #f4f6fb; }
+    .stage { position: absolute; left: 90px; right: 90px; top: 168px; height: 1162px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .accent { color: #ffe14a; }
+    #payoff-k { font-size: 64px; font-weight: 500; opacity: .75; }
+    #payoff-v { font-size: 220px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 16px 0; }
+    #payoff-t { font-size: 72px; font-weight: 700; line-height: 1.35; }
+    #payoff-src { position: absolute; left: 0; right: 0; top: 1240px; text-align: center; font-size: 30px; font-weight: 400; opacity: .55; }
+  </style>
+  <div id="root" data-composition-id="payoff" data-width="1080" data-height="1920">
+    <div class="stage clip" id="payoff-stage" data-start="0" data-duration="3.5">
+      <p id="payoff-k">이 영상이 끝나는 14초 동안</p>
+      <p id="payoff-v" class="accent">약 600번</p>
+      <p id="payoff-t">지구 어딘가에<br />번개가 쳤습니다</p>
+    </div>
+    <p id="payoff-src" class="clip" data-start="0" data-duration="3.5">출처: NOAA · NASA 위성 관측 (전 세계 초당 약 44회)</p>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#payoff-k", { opacity: 0, filter: "blur(6px)" }, { opacity: 0.75, filter: "blur(0px)", duration: 0.15, ease: "power4.out" }, 0.05);
+    tl.fromTo("#payoff-v", { opacity: 0, scale: 1.25, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.35);
+    tl.fromTo("#payoff-t", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.9);
+    tl.fromTo("#payoff-src", { opacity: 0 }, { opacity: 0.55, duration: 0.3 }, 0.4);
+    window.__timelines["payoff"] = tl;
+  </script>
+</template>

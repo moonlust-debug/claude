@@ -1,0 +1,41 @@
+<template>
+  <style>
+    @font-face { font-family: "Noto Sans KR"; src: url("assets/fonts/NotoSansKR.ttf"); font-weight: 100 900; }
+    #root { position: absolute; inset: 0; font-family: 'Noto Sans KR', sans-serif; color: #f4f6fb; }
+    .stage { position: absolute; left: 90px; right: 90px; top: 168px; height: 1162px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .accent { color: #ffe14a; }
+    #count-label { font-size: 72px; font-weight: 700; margin-bottom: 8px; }
+    #count-num-row { display: flex; align-items: baseline; justify-content: center; }
+    #count-num { font-size: 420px; font-weight: 900; line-height: 1; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: #ffe14a; min-width: 480px; text-align: right; }
+    #count-unit { font-size: 120px; font-weight: 900; margin-left: 12px; }
+    #count-dots { display: grid; grid-template-columns: repeat(11, 48px); gap: 22px; margin-top: 64px; }
+    .dot { display: block; width: 48px; height: 48px; border-radius: 50%; background: #2a3158; }
+    #count-flash { position: absolute; inset: 0; background: #fffbe6; }
+  </style>
+  <div id="root" data-composition-id="count" data-width="1080" data-height="1920">
+    <div class="stage clip" id="count-stage" data-start="0" data-duration="4">
+      <div id="count-wrap">
+        <p id="count-label">1초에</p>
+        <div id="count-num-row"><span id="count-num">0</span><span id="count-unit">번</span></div>
+        <div id="count-dots"><i class="dot" id="count-dot-0"></i><i class="dot" id="count-dot-1"></i><i class="dot" id="count-dot-2"></i><i class="dot" id="count-dot-3"></i><i class="dot" id="count-dot-4"></i><i class="dot" id="count-dot-5"></i><i class="dot" id="count-dot-6"></i><i class="dot" id="count-dot-7"></i><i class="dot" id="count-dot-8"></i><i class="dot" id="count-dot-9"></i><i class="dot" id="count-dot-10"></i><i class="dot" id="count-dot-11"></i><i class="dot" id="count-dot-12"></i><i class="dot" id="count-dot-13"></i><i class="dot" id="count-dot-14"></i><i class="dot" id="count-dot-15"></i><i class="dot" id="count-dot-16"></i><i class="dot" id="count-dot-17"></i><i class="dot" id="count-dot-18"></i><i class="dot" id="count-dot-19"></i><i class="dot" id="count-dot-20"></i><i class="dot" id="count-dot-21"></i><i class="dot" id="count-dot-22"></i><i class="dot" id="count-dot-23"></i><i class="dot" id="count-dot-24"></i><i class="dot" id="count-dot-25"></i><i class="dot" id="count-dot-26"></i><i class="dot" id="count-dot-27"></i><i class="dot" id="count-dot-28"></i><i class="dot" id="count-dot-29"></i><i class="dot" id="count-dot-30"></i><i class="dot" id="count-dot-31"></i><i class="dot" id="count-dot-32"></i><i class="dot" id="count-dot-33"></i><i class="dot" id="count-dot-34"></i><i class="dot" id="count-dot-35"></i><i class="dot" id="count-dot-36"></i><i class="dot" id="count-dot-37"></i><i class="dot" id="count-dot-38"></i><i class="dot" id="count-dot-39"></i><i class="dot" id="count-dot-40"></i><i class="dot" id="count-dot-41"></i><i class="dot" id="count-dot-42"></i><i class="dot" id="count-dot-43"></i></div>
+      </div>
+    </div>
+    <div id="count-flash" class="clip" data-start="0" data-duration="4" data-layout-ignore></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const num = document.querySelector("#count-num");
+    const dots = Array.from(document.querySelectorAll("#count-root .dot, #root .dot"));
+    const proxy = { v: 0 };
+    const paint = () => {
+      const n = Math.round(proxy.v);
+      num.textContent = n;
+      dots.forEach((d, i) => { d.style.background = i < n ? "#ffe14a" : "#2a3158"; });
+    };
+    tl.fromTo("#count-flash", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "expo.out" }, 0);
+    tl.fromTo("#count-label", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 0.2);
+    tl.fromTo(proxy, { v: 0 }, { v: 44, duration: 1.5, ease: "power2.out", onUpdate: paint, onStart: paint }, 0.4);
+    tl.fromTo("#count-wrap", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power3.in" }, 3.75);
+    window.__timelines["count"] = tl;
+  </script>
+</template>

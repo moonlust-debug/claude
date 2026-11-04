@@ -1,0 +1,24 @@
+<template>
+  <style>
+    @font-face { font-family: "Noto Sans KR"; src: url("assets/fonts/NotoSansKR.ttf"); font-weight: 100 900; }
+    #root { position: absolute; inset: 0; font-family: 'Noto Sans KR', sans-serif; color: #f4f6fb; }
+    .stage { position: absolute; left: 90px; right: 90px; top: 168px; height: 1162px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .accent { color: #ffe14a; }
+    .scale-line { margin: 40px 0; }
+    .scale-k { font-size: 64px; font-weight: 500; opacity: .75; }
+    .scale-v { font-size: 136px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; }
+  </style>
+  <div id="root" data-composition-id="scale" data-width="1080" data-height="1920">
+    <div class="stage clip" id="scale-stage" data-start="0" data-duration="3.5">
+      <div class="scale-line" id="scale-day"><p class="scale-k">하루면</p><p class="scale-v">약 <span class="accent">380만</span> 번</p></div>
+      <div class="scale-line" id="scale-year"><p class="scale-k">1년이면</p><p class="scale-v">약 <span class="accent">14억</span> 번</p></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#scale-day", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.05);
+    tl.fromTo("#scale-year", { opacity: 0, y: 60, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 1.2);
+    tl.fromTo("#scale-day, #scale-year", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power3.in", immediateRender: false }, 3.25);
+    window.__timelines["scale"] = tl;
+  </script>
+</template>
