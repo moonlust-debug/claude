@@ -55,6 +55,10 @@ SKILLS=(
   "Leonxlnx/earshot:real-sound"
   "toosean/skills:openverse"
   "varnan-tech/opendirectory:openverse-sfx"
+  "heygen-com/hyperframes:hyperframes"
+  "heygen-com/hyperframes:hyperframes-cli"
+  "heygen-com/hyperframes:hyperframes-registry"
+  "heygen-com/hyperframes:media-use"
 )
 
 installed=()
