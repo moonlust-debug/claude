@@ -54,6 +54,7 @@ SKILLS=(
   "Leonxlnx/earshot:earshot"
   "Leonxlnx/earshot:real-sound"
   "toosean/skills:openverse"
+  "varnan-tech/opendirectory:openverse-sfx"
 )
 
 installed=()
