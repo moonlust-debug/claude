@@ -59,6 +59,11 @@ SKILLS=(
   "heygen-com/hyperframes:hyperframes-cli"
   "heygen-com/hyperframes:hyperframes-registry"
   "heygen-com/hyperframes:media-use"
+  "heygen-com/hyperframes:figma"
+  "heygen-com/hyperframes:reverse-any-video"
+  "heygen-com/hyperframes:slideshow"
+  "heygen-com/hyperframes:style-sampling"
+  "heygen-com/hyperframes:remotion-to-hyperframes"
 )
 
 installed=()
