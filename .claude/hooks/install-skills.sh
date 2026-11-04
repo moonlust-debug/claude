@@ -116,4 +116,6 @@ done
 # hook instead. Move it to its own entry if that deny rule is ever lifted.
 HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$HOOK_DIR/install-user-memory.sh" ] && bash "$HOOK_DIR/install-user-memory.sh"
+# Same reason: OpenMontage backs the ai-video-gen skill above.
+[ -f "$HOOK_DIR/install-openmontage.sh" ] && bash "$HOOK_DIR/install-openmontage.sh"
 exit 0

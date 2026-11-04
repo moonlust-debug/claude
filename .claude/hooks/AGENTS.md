@@ -14,6 +14,7 @@
 |------|-------------|
 | `install-skills.sh` | 개인 스킬 확보. ①`npx skills add` 로 원격 스킬 설치(현재 `anthropics/skills:skill-creator`) ②저장소의 `skills/` 를 `$SKILLS_DIR` 로 복사 |
 | `install-video-deps.sh` | `/watch` 플러그인(watch@claude-video)이 필요한 `ffmpeg`·`ffprobe`·`yt-dlp` 확보 |
+| `install-openmontage.sh` | `ai-video-gen` 스킬의 본체인 OpenMontage 를 `~/OpenMontage`(`OPENMONTAGE_DIR` 로 변경)에 클론하고 `make setup` 을 백그라운드로 돌린다. settings.json 편집이 막혀 있어 `install-skills.sh` 끝에서 호출된다. API 키는 그 폴더의 `.env` 에 머신마다 넣는다 |
 | `install-codex.sh` | ChatGPT 이미지 생성용 Codex CLI(`@openai/codex`) 확보. 로그인(`~/.codex/auth.json`)은 컨테이너와 함께 사라지므로 새 웹 세션마다 `codex login --device-auth` 필요 |
 
 ## Subdirectories
