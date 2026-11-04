@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Noto Sans KR"; src: url("assets/fonts/NotoSansKR.ttf"); font-weight: 100 900; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0b0e1a; }
+      #bg { position: absolute; inset: 0; background: radial-gradient(120% 70% at 50% 30%, #1a2142 0%, #0b0e1a 70%); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="14" data-width="1080" data-height="1920">
+      <div id="bg"></div>
+      <div id="hook" data-composition-id="hook" data-composition-src="compositions/hook.html"
+        data-start="0" data-duration="3" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="count" data-composition-id="count" data-composition-src="compositions/count.html"
+        data-start="3" data-duration="4" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="scale" data-composition-id="scale" data-composition-src="compositions/scale.html"
+        data-start="7" data-duration="3.5" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="payoff" data-composition-id="payoff" data-composition-src="compositions/payoff.html"
+        data-start="10.5" data-duration="3.5" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
