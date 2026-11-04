@@ -149,17 +149,10 @@
         "source": "github",
         "repo": "bradautomates/claude-video"
       }
-    },
-    "moonlust": {
-      "source": {
-        "source": "github",
-        "repo": "moonlust-debug/claude"
-      }
     }
   },
   "enabledPlugins": {
-    "watch@claude-video": true,
-    "earshot@moonlust": true
+    "watch@claude-video": true
   },
   "hooks": {
     "SessionStart": [
