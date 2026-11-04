@@ -64,6 +64,9 @@ SKILLS=(
   "heygen-com/hyperframes:slideshow"
   "heygen-com/hyperframes:style-sampling"
   "heygen-com/hyperframes:remotion-to-hyperframes"
+  # Picked by GitHub stars, not skills.sh installs: the "ai-video-generation"
+  # forks with ~1M installs have 0-18 stars each, so the install counts are noise.
+  "calesthio/OpenMontage:ai-video-gen"
 )
 
 installed=()
