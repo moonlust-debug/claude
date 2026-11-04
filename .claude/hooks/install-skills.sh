@@ -53,6 +53,7 @@ SKILLS=(
   "jakeschincariol/claude-illegal-codes:67"
   "Leonxlnx/earshot:earshot"
   "Leonxlnx/earshot:real-sound"
+  "toosean/skills:openverse"
 )
 
 installed=()
