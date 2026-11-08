@@ -52,7 +52,8 @@
       "Edit(./.env)",
       "Edit(./.env.*)",
       "Edit(./.git/**)",
-      "Edit(./.claude/settings.local.json)"
+      "Edit(./.claude/settings.local.json)",
+            "Edit(./.claude/settings.json)",
     ],
     "allow": [
       "Read",
@@ -139,7 +140,17 @@
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
       "Bash(cargo build:*)",
-      "Bash(make:*)"
+           "Bash(make:*)",
+      "Bash(python3 scripts/esrgan-upscale.py:*)",
+      "Bash(codex exec --skip-git-repo-check:*)",
+      "Bash(codex login:*)"
+    ]
+  },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Running `python3 scripts/esrgan-upscale.py` from this repository to upscale images. It downloads Real-ESRGAN weights from huggingface.co/ai-forever/Real-ESRGAN, checks a pinned SHA-256 and loads them with torch.load(weights_only=True); the user approved this on 2026-11-08.",
+      "Running `codex exec` without --full-auto or sandbox-bypass flags to generate or edit images with Codex's built-in image tool for this repository's images/ folder, as AGENTS.md asks."
     ]
   },
   "extraKnownMarketplaces": {
