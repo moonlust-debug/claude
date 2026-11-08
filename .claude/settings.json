@@ -52,7 +52,6 @@
       "Edit(./.env)",
       "Edit(./.env.*)",
       "Edit(./.git/**)",
-      "Edit(./.claude/settings.json)",
       "Edit(./.claude/settings.local.json)"
     ],
     "allow": [
