@@ -53,7 +53,7 @@
       "Edit(./.env.*)",
       "Edit(./.git/**)",
       "Edit(./.claude/settings.local.json)",
-            "Edit(./.claude/settings.json)",
+            "Edit(./.claude/settings.json)"
     ],
     "allow": [
       "Read",
