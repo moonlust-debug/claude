@@ -67,6 +67,15 @@ SKILLS=(
   # Picked by GitHub stars, not skills.sh installs: the "ai-video-generation"
   # forks with ~1M installs have 0-18 stars each, so the install counts are noise.
   "calesthio/OpenMontage:ai-video-gen"
+  # 쇼츠 제작 흐름(기획→대본→자막→썸네일)의 빈칸. 유료 API 전용(muapi·higgsfield)은 뺐다.
+  "calesthio/OpenMontage:text-to-speech"
+  "social-media-skills/skills:youtube-shorts"
+  "social-media-skills/skills:short-form-video-script"
+  "charlie947/social-media-skills:youtube-thumbnail"
+  "JosiahSiegel/claude-plugin-marketplace:ffmpeg-captions-subtitles"
+  # 한국어 자막·포스터 문구 검수용
+  "NomaDamas/k-skill:korean-spell-check"
+  "NomaDamas/k-skill:korean-character-count"
 )
 
 installed=()
