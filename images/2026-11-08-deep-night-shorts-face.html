@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Deep Night 깊은 밤 — face</title>
+<!-- 4번째 판. ChatGPT 판과 비교해 보니 쇼츠 썸네일은 얼굴 클로즈업과 눈맞춤이 이긴다.
+     그래서 키 비주얼만 얼굴 클로즈업(codex exec, 실존 인물과 닮지 않게 요청)으로 바꾸고,
+     배경은 테크풍 곡선 대신 보라 안개와 서울 야경 보케, 글자는 압축 굵은체로 유지했다.
+     얼굴이 화면 32% 지점부터 시작하므로 제목은 그 위 하늘에 한 줄로 넣는다. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=Inter:wght@500;600&display=swap">
+<style>
+:root {
+  --ink: #f6f2ff;
+  --lavender: #dccbff;
+  --dim: rgba(246, 242, 255, 0.66);
+  --night: #0d0614;
+}
+body { margin: 0; background: var(--night); }
+.poster { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--night); color: var(--ink); font-family: 'Inter', sans-serif; }
+.kv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.shade { position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(13,6,20,0.6) 0%, rgba(13,6,20,0.2) 22%, rgba(13,6,20,0) 32%),
+    linear-gradient(0deg, rgba(13,6,20,0.55) 0%, rgba(13,6,20,0) 18%); }
+.grain { position: absolute; inset: 0; opacity: 0.08; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+.top { position: absolute; left: 72px; right: 72px; top: 88px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 24px; font-weight: 600; letter-spacing: 0.34em; color: var(--dim); }
+.top .rule { flex: 1; height: 1px; margin: 0 28px; background: rgba(246,242,255,0.28); }
+
+.title { position: absolute; left: 0; right: 0; top: 200px; text-align: center; }
+h1 { margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 212px; line-height: 0.9; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink); text-shadow: 0 6px 40px rgba(13, 6, 20, 0.6); }
+.ko { margin: 30px 0 0; font-family: 'Black Han Sans', sans-serif; font-size: 76px; line-height: 1; letter-spacing: 0.32em;
+  padding-left: 0.32em; color: var(--lavender); text-shadow: 0 4px 24px rgba(13, 6, 20, 0.7); }
+</style>
+</head>
+<body>
+<main class="poster">
+  <img class="kv" src="2026-11-08-deep-night-keyvisual-face.png" alt="보라 네온 빗속 서울 야경을 배경으로 카메라를 내려다보는 래퍼의 얼굴 클로즈업">
+  <div class="shade"></div>
+  <div class="grain"></div>
+
+  <div class="top"><span>MUSIC FEVER FOREVER</span><span class="rule"></span><span>K-HIPHOP</span></div>
+
+  <div class="title">
+    <h1>Deep Night</h1>
+    <p class="ko">깊은 밤</p>
+  </div>
+</main>
+</body>
+</html>
