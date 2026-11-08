@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Deep Night 깊은 밤 — blackletter</title>
+<!-- 얼굴 클로즈업 판(2026-11-08-deep-night-shorts-face.html)의 블랙레터 변형. 키 비주얼과 배치는 같고 서체만 다르다.
+     Grenze Gotisch·Pirata One 도 비교했지만 N 이 'll' 처럼 읽혀서 UnifrakturCook 을 골랐다.
+     블랙레터 제목이 장식이 많아 한글은 얇은 산세리프로 대비를 줬다. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Noto+Sans+KR:wght@400&family=Inter:wght@500;600&display=swap">
+<style>
+:root {
+  --ink: #f6f2ff;
+  --lavender: #dccbff;
+  --dim: rgba(246, 242, 255, 0.66);
+  --night: #0d0614;
+}
+body { margin: 0; background: var(--night); }
+.poster { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--night); color: var(--ink); font-family: 'Inter', sans-serif; }
+.kv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.shade { position: absolute; inset: 0;
+  background:
+    linear-gradient(0deg, rgba(13,6,20,0.45) 0%, rgba(13,6,20,0) 14%); }
+
+.top { position: absolute; left: 72px; right: 72px; top: 88px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 24px; font-weight: 600; letter-spacing: 0.34em; color: var(--dim); }
+.top .rule { flex: 1; height: 1px; margin: 0 28px; background: rgba(246,242,255,0.28); }
+
+.title { position: absolute; left: 0; right: 0; top: 200px; text-align: center; }
+h1 { margin: 0; font-family: 'UnifrakturCook', serif; font-weight: 700; font-size: 200px; line-height: 1; letter-spacing: 0px;
+  color: var(--ink); text-shadow: 0 6px 40px rgba(13, 6, 20, 0.6); }
+.ko { margin: 34px 0 0; font-family: 'Noto Sans KR', sans-serif; font-weight: 400; font-size: 48px; line-height: 1; letter-spacing: 1em;
+  padding-left: 1em; color: var(--lavender); text-shadow: 0 4px 24px rgba(13, 6, 20, 0.7); }
+</style>
+</head>
+<body>
+<main class="poster">
+  <img class="kv" src="2026-11-08-deep-night-keyvisual-face.png" alt="보라 네온 빗속 서울 야경을 배경으로 카메라를 내려다보는 래퍼의 얼굴 클로즈업">
+  <div class="shade"></div>
+
+  <div class="top"><span>MUSIC FEVER FOREVER</span><span class="rule"></span><span>K-HIPHOP</span></div>
+
+  <div class="title">
+    <h1>Deep Night</h1>
+    <p class="ko">깊은 밤</p>
+  </div>
+</main>
+</body>
+</html>
