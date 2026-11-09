@@ -76,6 +76,8 @@ SKILLS=(
   # 한국어 자막·포스터 문구 검수용
   "NomaDamas/k-skill:korean-spell-check"
   "NomaDamas/k-skill:korean-character-count"
+  # PDF·Office·HTML 등을 마크다운으로 변환(Microsoft MarkItDown 래퍼)
+  "K-Dense-AI/claude-scientific-skills:markitdown"
 )
 
 installed=()
