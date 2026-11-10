@@ -129,4 +129,6 @@ HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$HOOK_DIR/install-user-memory.sh" ] && bash "$HOOK_DIR/install-user-memory.sh"
 # Same reason: OpenMontage backs the ai-video-gen skill above.
 [ -f "$HOOK_DIR/install-openmontage.sh" ] && bash "$HOOK_DIR/install-openmontage.sh"
+# Same reason: MarkItDown is the converter the markitdown skill above drives.
+[ -f "$HOOK_DIR/install-markitdown.sh" ] && bash "$HOOK_DIR/install-markitdown.sh"
 exit 0
