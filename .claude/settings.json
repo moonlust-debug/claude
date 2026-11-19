@@ -163,7 +163,7 @@
     "ecc": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "affaan-m/ECC"
       }
     }
   },
