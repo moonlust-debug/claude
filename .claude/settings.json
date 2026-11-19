@@ -53,7 +53,7 @@
       "Edit(./.env.*)",
       "Edit(./.git/**)",
       "Edit(./.claude/settings.local.json)",
-            "Edit(./.claude/settings.json)"
+      "Edit(./.claude/settings.json)"
     ],
     "allow": [
       "Read",
@@ -140,7 +140,7 @@
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
       "Bash(cargo build:*)",
-           "Bash(make:*)",
+      "Bash(make:*)",
       "Bash(python3 scripts/esrgan-upscale.py:*)",
       "Bash(codex exec --skip-git-repo-check:*)",
       "Bash(codex login:*)"
@@ -159,10 +159,17 @@
         "source": "github",
         "repo": "bradautomates/claude-video"
       }
+    },
+    "ecc": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/everything-claude-code"
+      }
     }
   },
   "enabledPlugins": {
-    "watch@claude-video": true
+    "watch@claude-video": true,
+    "ecc@ecc": true
   },
   "hooks": {
     "SessionStart": [
