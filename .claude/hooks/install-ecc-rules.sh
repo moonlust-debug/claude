@@ -10,7 +10,7 @@ set -uo pipefail
 
 SRC="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}/rules/ecc"
 DEST="$HOME/.claude/rules/ecc"
-PACKS=(common python typescript react)
+PACKS=(common python typescript react web)
 
 [ -d "$SRC" ] || exit 0
 
