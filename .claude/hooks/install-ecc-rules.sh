@@ -10,7 +10,7 @@ set -uo pipefail
 
 SRC="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}/rules/ecc"
 DEST="$HOME/.claude/rules/ecc"
-PACKS=(common python typescript react web golang)
+PACKS=(common python typescript react web golang angular cpp csharp dart fsharp java kotlin perl php ruby rust swift)
 
 [ -d "$SRC" ] || exit 0
 
