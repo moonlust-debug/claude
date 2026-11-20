@@ -9,14 +9,22 @@
 검토하지 않은 변경이 저절로 들어오면 안 되기 때문이다.
 갱신하려면 새 커밋의 폴더들을 검토한 뒤 이 폴더를 교체하고 위 커밋 값을 고친다.
 
-## 전역 설치 팩 (18개)
+## 전역 설치 팩 (20개)
 `.claude/hooks/install-ecc-rules.sh` 의 `PACKS` 에 적힌 팩만 세션 시작 때
-`~/.claude/rules/ecc/` 로 복사한다. 모두 자기 언어 파일에만 걸려 서로 충돌하지 않는다.
+`~/.claude/rules/ecc/` 로 복사한다.
 
 `common` `python` `typescript` `react` `web` `golang` `angular` `cpp` `csharp` `dart`
-`fsharp` `java` `kotlin` `perl` `php` `ruby` `rust` `swift`
+`fsharp` `java` `kotlin` `perl` `php` `ruby` `rust` `swift` `vue` `nuxt`
 
-## 프로젝트별로만 쓰는 팩 (3개 + react-native)
+`vue`·`nuxt` 는 다른 프로젝트 파일에도 걸리지만 사용자 요청(2026-11-20)으로 전역에 둔다.
+알려진 영향:
+- `vue/hooks.md` 가 모든 `*.ts`·`*.tsx` 에 걸리고 "plain `tsc` 대신 `vue-tsc`" 를 권한다.
+  Vue 가 아닌 TS 프로젝트에서는 이 지시를 무시하고 프로젝트의 기존 typecheck 를 따른다.
+- `nuxt` 의 `**/pages/**`·`**/middleware/**`·`**/server/**/*.ts` 가 Next.js 등에도 걸린다.
+  Nuxt 가 아닌 프로젝트에서는 `useFetch` 등 Nuxt 전용 지시를 적용하지 않는다.
+- 언어별 규칙과 충돌하면 원본 README 대로 더 구체적인 쪽(해당 프로젝트 스택)을 따른다.
+
+## 프로젝트별로만 쓰는 팩 (2개)
 아래 팩은 그 프레임워크가 아닌 프로젝트 파일에도 걸리는 넓은 경로를 쓰거나 다른 팩과
 상충해서 `PACKS` 에 넣지 않는다.
 
@@ -24,12 +32,10 @@
 |----|----|
 | `react-native` | 모든 `**/*.ts`·`**/*.tsx` 에 걸리고 "RN 프로젝트에는 `web/` 을 설치하지 말라"고 명시 |
 | `arkts` | HarmonyOS 전용인데 모든 `**/*.ts` 에 걸림 |
-| `vue` | `hooks.md` 가 모든 `**/*.ts`·`**/*.tsx` 에 걸리고 "plain `tsc` 를 typecheck 훅으로 쓰지 말라"고 해 일반 TS 와 상충 |
-| `nuxt` | `**/pages/**`·`**/middleware/**`·`**/server/**/*.ts` 가 Next.js 등 다른 프로젝트에도 걸림 |
 
 해당 프로젝트에서만 그 프로젝트의 `.claude/rules/` 로 복사해 쓴다(저장소 루트에서 실행).
 
 ```bash
 mkdir -p <프로젝트>/.claude/rules/ecc
-cp -R rules/ecc/<팩> <프로젝트>/.claude/rules/ecc/      # 예: react-native, vue, nuxt(+vue), arkts
+cp -R rules/ecc/<팩> <프로젝트>/.claude/rules/ecc/      # 예: react-native, arkts
 ```
