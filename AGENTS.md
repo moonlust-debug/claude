@@ -21,7 +21,7 @@ moonlust-debug 의 Claude Code 개인 설정 보관소다. 코드 프로젝트�
 | `telegram/` | 텔레그램 채널 플러그인 설치 스크립트와 프록시 우회 기록 (see `telegram/AGENTS.md`) |
 | `skills/` | 개인 스킬 실체. `~/.claude/skills` 가 정션으로 여기를 가리킨다 (see `skills/AGENTS.md`) |
 | `images/` | Codex(ChatGPT)로 생성한 이미지 보관. 웹 세션 컨테이너는 사라지므로 남길 이미지는 여기로 옮겨 커밋한다. Claude Design 캔버스로 만든 디자인은 단독 HTML 로 옮겨 같은 이름의 `.html` 원본과 함께 1080×1920 등 원래 크기로 캡처해 둔다. 파일명은 `YYYY-MM-DD-<설명>.png` |
-| `rules/` | Claude Code rules 고정 사본. `rules/ecc/` 는 ECC `rules/` 전체 21개 팩(출처·커밋·팩 목록은 `rules/ecc/SOURCE.md`). `install-ecc-rules.sh` 훅이 `PACKS` 의 20개 팩을 `~/.claude/rules/ecc/` 로 복사하고, 다른 프로젝트와 충돌하는 `react-native`·`arkts` 는 해당 프로젝트의 `.claude/rules/` 로만 복사한다. 갱신은 검토 후 폴더 교체 |
+| `rules/` | Claude Code rules 고정 사본. `rules/ecc/` 는 ECC `rules/` 전체 22개 팩(출처·커밋·팩 목록은 `rules/ecc/SOURCE.md`). `install-ecc-rules.sh` 훅이 `PACKS` 로 22개 팩 전부를 `~/.claude/rules/ecc/` 로 복사한다. 다른 프로젝트 파일에도 걸리는 `vue`·`nuxt`·`react-native`·`arkts` 의 영향은 `SOURCE.md` 에 기록. 갱신은 검토 후 폴더 교체 |
 | `scripts/` | 세션 밖에서도 다시 쓰는 보조 스크립트. `esrgan-upscale.py` 는 Real-ESRGAN x2 업스케일(가중치 SHA-256 고정, `weights_only=True` 로 로드) |
 | `videos/` | `code-video` 스킬로 렌더한 MP4 와 원본 HTML 보관. 파일명은 `YYYY-MM-DD-<설명>.mp4` |
 | `memory/` | 세션 간 기억. `.gitignore` 로 추적 제외 — 문서화 대상 아님 |
